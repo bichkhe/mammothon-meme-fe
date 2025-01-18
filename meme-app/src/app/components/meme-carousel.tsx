@@ -14,7 +14,7 @@ import React from "react";
 
 const HotMemeCoins = [
   {
-    icon: "/pile_of_poo.png",
+    icon: "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",
     name: "Doge",
     symbol: "DOGE",
     price: 0.3,
@@ -23,7 +23,7 @@ const HotMemeCoins = [
     change: 0.000001,
   },
   {
-    icon: "/pile_of_poo.png",
+    icon: "/shiba.png",
     name: "Shiba",
     symbol: "SHIB",
     price: 0.00001,
@@ -32,16 +32,16 @@ const HotMemeCoins = [
     change: 0.000001,
   },
   {
-    icon: "/pile_of_poo.png",
-    name: "Floki",
-    symbol: "FLOKI",
+    icon: "/btc.png",
+    name: "bitcoin",
+    symbol: "BTC",
     price: 0.00001,
     market_cap: "200,278.91",
     all_time_vol: "34,850.5",
     change: 0.000001,
   },
   {
-    icon: "/pile_of_poo.png",
+    icon: "/safemoon.png",
     name: "SafeMoon",
     symbol: "SAFEMOON",
     price: 0.00001,
@@ -64,8 +64,8 @@ const MemeCarousel = () => {
         {HotMemeCoins.map((meme, index) => (
           <CarouselItem key={index}>
             <div className="p-1">
-              <CardContent className="flex  items-center justify-center p-6 bg-black min-w-screen">
-                <Rocket className="size-12 text-red-600 right-10" />
+              <CardContent className="flex items-center justify-center p-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-w-screen">
+                {/* <Rocket className="size-12 text-red-600 right-10" /> */}
                 <Image
                   src={meme.icon}
                   alt={meme.name}
