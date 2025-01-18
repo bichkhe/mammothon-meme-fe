@@ -14,6 +14,7 @@
     "@thirdweb-dev/sdk": "^4.0.99",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "convex": "^1.18.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "ethers": "^6.13.5",

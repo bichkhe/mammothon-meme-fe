@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import React, { useState } from "react";
 
 const MemeSearch = () => {
@@ -16,30 +17,29 @@ const MemeSearch = () => {
   };
 
   return (
-    <div className="flex justify-between items-center p-4 text-white gap-2">
-      <Input
-        value={query}
-        onChange={handleSearchChange}
-        // placeholder="Search memes..."
-      />
-      {/* <input
-        type="text"
-        value={query}
-        onChange={handleSearchChange}
-        placeholder="Search memes..."
-      /> */}
-      <div className="flex flex-col gap-2">
-        <span>Page {page}</span>
-        <Button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="w-full"
-        >
-          Previous
-        </Button>
-        <Button onClick={() => handlePageChange(page + 1)} className="w-full">
-          Next
-        </Button>
+    <div className="p-4 text-white bg-black rounded-xl gap-2 ">
+      <span className="text-white">Search</span>
+      <div className="flex items-center gap-2">
+        <Input
+          value={query}
+          onChange={handleSearchChange}
+          // placeholder="Search memes..."
+          className="max-w-xl"
+        />
+        <div className="flex-1"></div>
+        <div className="flex gap-2">
+          <span>Page {page}</span>
+          <Button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="w-full"
+          >
+            <ArrowBigLeft />
+          </Button>
+          <Button onClick={() => handlePageChange(page + 1)} className="w-full">
+            <ArrowBigRight />
+          </Button>
+        </div>
       </div>
     </div>
   );

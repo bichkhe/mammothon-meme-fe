@@ -1,9 +1,14 @@
+"use client";
+
 import React from "react";
 import MemeItem from "../components/meme-item";
 import MemeSearch from "../components/meme-search";
 import { HotMemeCoins } from "../constant";
-
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 const MemeList = () => {
+  const memes = useQuery(api.meme.get); //meme iss the name of file and get is the function name
+  console.log("meme:", memes);
   return (
     <div className="md:mx-[100px]">
       <MemeSearch />

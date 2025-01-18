@@ -1,3 +1,5 @@
+import { Menu } from "lucide-react";
+
 export const HotMemeCoins = [
   {
     icon: "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",
@@ -142,5 +144,33 @@ export const HotMemeCoins = [
     market_cap: "200,278.91",
     all_time_vol: "34,850.5",
     change: 0.000001,
+  },
+];
+
+export const MenuItems = [
+  {
+    name: "Home",
+    icon: <Menu />,
+    link: "/",
+  },
+  {
+    name: "Pools",
+    icon: <Menu />,
+    link: "/pools",
+  },
+  {
+    name: "Launch",
+    icon: <Menu />,
+    link: "/launch",
+  },
+  {
+    name: "Docs",
+    icon: <Menu />,
+    link: "/docs",
+  },
+  {
+    name: "About",
+    icon: <Menu />,
+    link: "/about",
   },
 ];
