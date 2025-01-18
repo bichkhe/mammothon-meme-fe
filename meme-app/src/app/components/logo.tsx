@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 const Logo = () => {
   return (
     <>
-      <div className="logo m-4 flex items-center justify-between flex-1">
+      <div className="logo m-4 flex items-center justify-between flex-1 md:flex-none">
         <Image
           src="/logo.png"
           alt="Logo"
@@ -13,13 +13,13 @@ const Logo = () => {
           height={100}
           className="mr-2"
         />{" "}
-        <Button variant="ghost" className="md:hidden" asChild>
-          <MenuIcon size={50} className="md:hidden min-w-[30px]" />
-        </Button>
         <span className="text-xl font-bold hidden md:block">
           {" "}
           Rust Warriors
         </span>
+        <Button variant="ghost" className="md:hidden" asChild>
+          <MenuIcon size={50} className="md:hidden min-w-[30px]" />
+        </Button>
       </div>
     </>
   );

@@ -110,7 +110,7 @@ export const HotMemeCoins = [
     change: 0.000001,
   },
   {
-    icon: "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",
+    icon: "/doge.png",
     name: "Doge",
     symbol: "DOGE",
     price: 0.3,

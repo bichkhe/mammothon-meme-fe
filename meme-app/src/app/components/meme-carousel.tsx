@@ -15,7 +15,7 @@ import { HotMemeCoins } from "../constant";
 const MemeCarousel = () => {
   return (
     <Carousel
-      className="w-full h-[400px] mx-auto "
+      className="w-full h-[400px] mx-auto"
       plugins={[
         Autoplay({
           delay: 4000,
@@ -26,7 +26,7 @@ const MemeCarousel = () => {
         {HotMemeCoins.map((meme, index) => (
           <CarouselItem key={index}>
             <div className="p-1">
-              <CardContent className="flex items-center justify-center p-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-w-screen">
+              <CardContent className="flex items-center justify-center p-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-w-screen gap-12">
                 {/* <Rocket className="size-12 text-red-600 right-10" /> */}
                 <Image
                   src={meme.icon}

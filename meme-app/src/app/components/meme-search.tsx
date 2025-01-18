@@ -1,15 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMemeStore } from "@/store/meme";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import React, { useState } from "react";
+import { useDebounce } from "use-debounce";
 
 const MemeSearch = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-
+  const { setSearchText } = useMemeStore();
+  const [debouncedValue] = useDebounce(query, 500);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+    const value = e.target.value;
+    setQuery(value);
+    setSearchText(value);
   };
 
   const handlePageChange = (newPage: number) => {

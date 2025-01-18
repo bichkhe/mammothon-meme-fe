@@ -30,6 +30,8 @@ const schema = defineSchema({
     last_swap_at: v.string(),
     created_at: v.string(),
     updated_at: v.string(),
+  }).index("by_name", ["name"]).searchIndex("search_name", {
+    searchField: "name",
   }),
 
 });
