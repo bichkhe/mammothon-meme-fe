@@ -7,49 +7,11 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Rocket } from "lucide-react";
 import Image from "next/image";
 
 import React from "react";
+import { HotMemeCoins } from "../constant";
 
-const HotMemeCoins = [
-  {
-    icon: "https://upload.wikimedia.org/wikipedia/en/d/d0/Dogecoin_Logo.png",
-    name: "Doge",
-    symbol: "DOGE",
-    price: 0.3,
-    market_cap: "200,278.91",
-    all_time_vol: "34,850.5",
-    change: 0.000001,
-  },
-  {
-    icon: "/shiba.png",
-    name: "Shiba",
-    symbol: "SHIB",
-    price: 0.00001,
-    market_cap: "200,278.91",
-    all_time_vol: "34,850.5",
-    change: 0.000001,
-  },
-  {
-    icon: "/btc.png",
-    name: "bitcoin",
-    symbol: "BTC",
-    price: 0.00001,
-    market_cap: "200,278.91",
-    all_time_vol: "34,850.5",
-    change: 0.000001,
-  },
-  {
-    icon: "/safemoon.png",
-    name: "SafeMoon",
-    symbol: "SAFEMOON",
-    price: 0.00001,
-    market_cap: "200,278.91",
-    all_time_vol: "34,850.5",
-    change: 0.000001,
-  },
-];
 const MemeCarousel = () => {
   return (
     <Carousel
@@ -73,7 +35,7 @@ const MemeCarousel = () => {
                   height={200}
                 />
                 <div className="flex flex-col gap-4 justify-center items-center">
-                  <div className="text-2xl text-white font-extralight">
+                  <div className="text-2xl text-white font-extralight ">
                     {meme.name}
                   </div>
                   <div className="text-2xl text-white font-extralight">
