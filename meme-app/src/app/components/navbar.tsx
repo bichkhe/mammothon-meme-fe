@@ -1,6 +1,7 @@
 import React from "react";
 import Logo from "./logo";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const NavBar = () => {
   return (
@@ -8,27 +9,28 @@ const NavBar = () => {
       <Logo />
       <ul className="flex justify-between m-1 items-center gap-4 h-16 text-black shadow-md font-mono">
         <li className="hover:bg-slate-900 rounded-md hover:text-white">
-          <a href="#home" className="p-2">
+          <Link href="#home" className="p-2">
             Home
-          </a>
+          </Link>
         </li>
         <li className="hover:bg-slate-900 rounded-md hover:text-white">
-          <a href="#home" className="p-2">
+          <Link href="#home" className="p-2">
             Pools
-          </a>
+          </Link>
         </li>
         <li className="hover:bg-slate-900 rounded-md hover:text-white">
-          <a href="#home" className="p-2">
+          <Link href="#home" className="p-2">
             Launch
-          </a>
+          </Link>
         </li>
         <li className="hover:bg-slate-900 rounded-md hover:text-white">
-          <a href="#home" className="p-2">
+          <Link href="#home" className="p-2">
             Docs
-          </a>
+          </Link>
         </li>
         <li>
           <Button>Connect Wallet</Button>
+        
         </li>
       </ul>
     </nav>

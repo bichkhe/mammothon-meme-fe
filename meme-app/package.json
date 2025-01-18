@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
+    "@thirdweb-dev/react": "^4.9.4",
+    "@thirdweb-dev/sdk": "^4.0.99",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-autoplay": "^8.5.2",
+    "embla-carousel-react": "^8.5.2",
+    "ethers": "^6.13.5",
     "lucide-react": "^0.471.0",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
