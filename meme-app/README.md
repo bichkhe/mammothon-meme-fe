@@ -43,6 +43,20 @@ yarn dev
 
 ## How to install a library 
 
-Add `--legacy-peer-deps`
-
+Add `--legacy-peer-deps`. Eg
+```bash
  npm install zustand --legacy-peer-deps
+ ```
+
+#  Run 
+
+- Run convex sync
+```bash 
+npx convex dev
+```
+
+- Run app
+
+```bash
+yarn dev
+```

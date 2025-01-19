@@ -11,6 +11,7 @@
   "dependencies": {
     "@convex-dev/react-query": "^0.0.0-alpha.8",
     "@radix-ui/react-slot": "^1.1.1",
+    "@tanstack/react-query": "^5.64.2",
     "@thirdweb-dev/react": "^4.9.4",
     "@thirdweb-dev/sdk": "^4.0.99",
     "class-variance-authority": "^0.7.1",

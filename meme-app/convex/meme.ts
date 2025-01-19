@@ -7,23 +7,23 @@ export const get = query({
     return await ctx.db.query("memes").collect();
   },
 });
-export const searchTokens = query({
-  args: {
-    query: v.string(),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.query("memes").filter((meme: any) => meme.name.includes(args.query)).collect();
-  },
-});
+// export const searchTokens = query({
+//   args: {
+//     query: v.string(),
+//   },
+//   handler: async (ctx, args) => {
+//     return await ctx.db.query("memes").filter((meme: any) => meme.name.includes(args.query)).collect();
+//   },
+// });
 
-export const searchTokens2 = query({
-  args: {
-    query: v.string(),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.query("memes").collect();
-  },
-});
+// export const searchTokens2 = query({
+//   args: {
+//     query: v.string(),
+//   },
+//   handler: async (ctx, args) => {
+//     return await ctx.db.query("memes").collect();
+//   },
+// });
 
 export const search = query({
   args: {
