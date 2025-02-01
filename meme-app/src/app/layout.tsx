@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

@@ -6,13 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 const useMeme = () => {
     const {searchText} = useMemeStore();
-    const  {data: fetchMemes} = useQuery(convexQuery(api.meme.get, {}));
-    const  {data: searchMemes}= useQuery(convexQuery(api.meme.search, { query: searchText }));
+    const  {data: fetchMemes, isLoading} = useQuery(convexQuery(api.meme.get, {}));
+    const  {data: searchMemes, isLoading: isLoadingSearch, error}= useQuery(convexQuery(api.meme.search, { query: searchText,
+         paginationOpts: {numItems: 2, cursor: null }}));
 
     if (!searchText) {
-        return { memes: fetchMemes, loading: false, error:  null, searchText };
+        return { memes: fetchMemes, loading: isLoading, error:  null, searchText };
     } else {
-        return { memes: searchMemes, loading: false, error: null, searchText };
+        return { memes: searchMemes, loading: isLoadingSearch, error: error, searchText };
     }
     
 };

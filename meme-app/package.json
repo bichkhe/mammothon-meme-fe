@@ -3,17 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 5555",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/wallet-sdk": "^4.3.0",
     "@convex-dev/react-query": "^0.0.0-alpha.8",
     "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.7",
     "@tanstack/react-query": "^5.64.2",
     "@thirdweb-dev/react": "^4.9.4",
     "@thirdweb-dev/sdk": "^4.0.99",
+    "@walletconnect/web3-provider": "^1.8.0",
+    "@web3modal/wallet": "^5.1.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.18.2",
@@ -27,6 +31,8 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.4",
+    "web3": "^4.16.0",
+    "web3modal": "^1.9.12",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

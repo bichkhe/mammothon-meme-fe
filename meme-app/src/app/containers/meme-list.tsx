@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MemeItem from "../components/meme-item";
 import MemeSearch from "../components/meme-search";
-import { HotMemeCoins } from "../constant";
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { useMemeStore } from "@/store/meme";
 import useMeme from "../hooks/useMeme";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MemeList = () => {
   const { memes, searchText } = useMeme();
@@ -37,9 +34,12 @@ const MemeList = () => {
         </div>
       )}
       {!memes && (
-        <div className="flex flex-1 justify-center items-center  text-2xl font-bold text-white bg-black p-2 rounded-md font-mono">
-          Searching:{" "}
-          <span className="font-mono text-md ml-5">{searchText}</span>
+        <div className="flex flex-1 justify-center items-center  text-2xl font-bold text-white p-2  font-mono  bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 animate-pulse">
+          <Skeleton className="w-full h-[500px] flex justify-center items-center">
+            <span className="font-mono text-md ml-5 text-4xl text-black j">
+              {searchText}
+            </span>
+          </Skeleton>
         </div>
       )}
     </div>

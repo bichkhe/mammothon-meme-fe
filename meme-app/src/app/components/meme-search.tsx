@@ -4,13 +4,11 @@ import { Input } from "@/components/ui/input";
 import { useMemeStore } from "@/store/meme";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import React, { useState } from "react";
-import { useDebounce } from "use-debounce";
 
 const MemeSearch = () => {
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const { setSearchText } = useMemeStore();
-  const [debouncedValue] = useDebounce(query, 500);
+  // const [page, setPage] = useState(1);
+  const { setSearchText, setPage, page } = useMemeStore();
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -33,7 +31,7 @@ const MemeSearch = () => {
         />
         <div className="flex-1"></div>
         <div className="flex gap-2">
-          <span>Page {page}</span>
+          <div>Current page: {page}</div>
           <Button
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
