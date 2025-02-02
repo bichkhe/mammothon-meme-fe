@@ -1,15 +1,26 @@
 import { ArrowRight } from "lucide-react";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface MemeItemProps {
   // Define the props for the MemeItem component
+  addr: string;
   icon: string;
   name: string;
   marketCap: string;
 }
-const MemeItem = ({ icon, name, marketCap }: MemeItemProps) => {
+const MemeItem = ({ icon, name, marketCap, addr }: MemeItemProps) => {
+  const router = useRouter();
+
+  const handleRedirect = () => {
+    router.push(`/meme/market?addr=${addr}`);
+  };
+
   return (
-    <div className="meme-item hover:border-blue-500 hover:border-4 bg-black p-4 text-white border-2 border-gray-700 hover:text-blue-600 cursor-pointer">
+    <div
+      className="meme-item hover:border-blue-500 hover:border-4 bg-black p-4 text-white border-2 border-gray-700 hover:text-blue-600 cursor-pointer"
+      onClick={handleRedirect}
+    >
       <div className="meme-header">
         <div className="flex justify-between">
           <span className="text-2xl text-gray-400">101</span>

@@ -16,7 +16,12 @@ const MemeList = () => {
         {memes &&
           memes.map(
             (
-              meme: { icon: string; name: string; market_cap: string },
+              meme: {
+                icon: string;
+                name: string;
+                market_cap: string;
+                addr: string;
+              },
               index: React.Key | null | undefined
             ) => (
               <MemeItem
@@ -24,6 +29,7 @@ const MemeList = () => {
                 icon={meme.icon}
                 name={meme.name}
                 marketCap={meme.market_cap}
+                addr={meme.addr}
               />
             )
           )}

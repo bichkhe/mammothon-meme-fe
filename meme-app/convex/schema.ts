@@ -1,6 +1,6 @@
-import {profile} from "console";
-import {defineSchema, defineTable} from "convex/server";
-import {v} from "convex/values";
+import { profile } from "console";
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
 import { url } from "inspector";
 const schema = defineSchema({
   users: defineTable({
@@ -30,9 +30,14 @@ const schema = defineSchema({
     last_swap_at: v.string(),
     created_at: v.string(),
     updated_at: v.string(),
-  }).index("by_name", ["name"]).searchIndex("search_name", {
-    searchField: "name",
-  }),
-
+  })
+    .index("by_name", ["name"])
+    .searchIndex("search_name", {
+      searchField: "name",
+    })
+    .index("by_addr", ["addr"])
+    .searchIndex("search_addr", {
+      searchField: "addr",
+    }),
 });
 export default schema;

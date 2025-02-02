@@ -32,10 +32,29 @@ export const search = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    return await ctx.db.query("memes").withSearchIndex("search_name", (q: any) =>  q.search("name", args.query)).collect();
+    return await ctx.db
+      .query("memes")
+      .withSearchIndex("search_name", (q: any) => q.search("name", args.query))
+      .collect();
     // return await ctx.db.query("memes")
     //   .withSearchIndex("search_name", (q: any) => q.search("name", args.query))
     //   .paginate(args.paginationOpts)
     // return await ctx.db.query("memes").filter((q: any) => q.includes(q.field("name", args.query))).collect();
+  },
+});
+
+export const getMeme = query({
+  args: {
+    addr: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const meme = await ctx.db
+      .query("memes")
+      .withIndex("by_addr", (q) => q.eq("addr", args.addr))
+      .first();
+    if (!meme) {
+      throw new Error(`Meme with address ${args.addr} not found`);
+    }
+    return meme;
   },
 });
