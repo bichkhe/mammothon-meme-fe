@@ -151,7 +151,7 @@ export const MenuItems = [
   {
     name: "Home",
     icon: <Menu />,
-    link: "/",
+    link: "/meme",
   },
   {
     name: "Pools",
