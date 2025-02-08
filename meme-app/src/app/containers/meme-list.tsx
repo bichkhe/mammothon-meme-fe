@@ -26,7 +26,7 @@ const MemeList = () => {
             ) => (
               <MemeItem
                 key={index}
-                icon={meme.icon}
+                icon={meme.icon || ""}
                 name={meme.name}
                 marketCap={meme.market_cap}
                 addr={meme.addr}

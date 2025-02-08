@@ -8,7 +8,7 @@ import React, { useState } from "react";
 const MemeSearch = () => {
   const [query, setQuery] = useState("");
   // const [page, setPage] = useState(1);
-  const { setSearchText, setPage, page } = useMemeStore();
+  const { setSearchText, setPage, currentPage } = useMemeStore();
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -31,15 +31,18 @@ const MemeSearch = () => {
         />
         <div className="flex-1"></div>
         <div className="flex gap-2">
-          <div>Current page: {page}</div>
+          <div>Current page: {currentPage}</div>
           <Button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
             className="w-full"
           >
             <ArrowBigLeft />
           </Button>
-          <Button onClick={() => handlePageChange(page + 1)} className="w-full">
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="w-full"
+          >
             <ArrowBigRight />
           </Button>
         </div>

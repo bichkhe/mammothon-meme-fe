@@ -23,11 +23,12 @@ const schema = defineSchema({
     addr: v.string(),
     icon: v.string(),
     market_cap: v.string(),
-    price: v.string(),
-    volume: v.string(),
-    all_time_vol: v.string(),
-    change24h: v.string(),
-    last_swap_at: v.string(),
+    price: v.optional(v.string()),
+    volume: v.optional(v.string()),
+    all_time_vol: v.optional(v.string()),
+    change24h: v.optional(v.string()),
+    last_swap_at: v.optional(v.string()),
+    description: v.optional(v.string()),
     created_at: v.string(),
     updated_at: v.string(),
   })
@@ -39,5 +40,10 @@ const schema = defineSchema({
     .searchIndex("search_addr", {
       searchField: "addr",
     }),
+  meme_images: defineTable({
+    storage_id: v.id("_storage"),
+    image: v.string(),
+    created_at: v.string(),
+  }).index("by_url", ["image"]),
 });
 export default schema;
