@@ -8,7 +8,7 @@ A **liquidity pool** in emojicoin.fun consists of three key components:
 
 Liquidity pools are used in **CPAMMs (Constant Product Automated Market Makers)** to facilitate decentralized trading by following the formula:
 
-\[ x \times y = k \]
+$x \times $y = k
 
 Where:
 - **x** = Quantity of **APT** in the pool.
