@@ -1,11 +1,8 @@
+"use client";
 import React from "react";
 import NavBar from "../components/navbar"; // Adjust the import path as necessary
-import { Geist, Geist_Mono } from "next/font/google";
-import { Metadata } from "next";
 import { ConvexClientProvider } from "../ConvexClientProvider";
-import { ConvexQueryClient } from "@convex-dev/react-query";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ConvexReactClient } from "convex/react";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 // const convexUrl = process.env.VITE_CONVEX_URL;
 // if (!convexUrl) {
@@ -40,12 +37,17 @@ import { ConvexReactClient } from "convex/react";
 
 const MainHomeLayout = ({ children }: { children: React.ReactNode }) => {
   return (
+    // <ThirdwebProvider
+    //   clientId="d9e4941f828ef19d6379f81337129438"
+    //   activeChain="goerli"
+    // >
     <ConvexClientProvider>
       <div className="h-screen min-h-screen max-h-screen overflow-auto bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
         <NavBar />
         <div className="flex flex-col w-full h-full">{children}</div>
       </div>
     </ConvexClientProvider>
+    // </ThirdwebProvider>
   );
 };
 

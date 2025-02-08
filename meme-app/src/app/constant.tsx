@@ -151,7 +151,7 @@ export const MenuItems = [
   {
     name: "Home",
     icon: <Menu />,
-    link: "/",
+    link: "/meme",
   },
   {
     name: "Pools",
@@ -159,9 +159,9 @@ export const MenuItems = [
     link: "/pools",
   },
   {
-    name: "Launch",
+    name: "Create Meme",
     icon: <Menu />,
-    link: "/launch",
+    link: "/meme/create",
   },
   {
     name: "Docs",

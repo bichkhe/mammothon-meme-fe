@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ContextProvider from "@/context/appkit";
 import { headers } from "next/headers";
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
