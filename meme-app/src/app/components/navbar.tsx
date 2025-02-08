@@ -30,7 +30,7 @@ const NavBar = () => {
             className="hover:bg-slate-900 rounded-md hover:text-white"
             key={item.name}
           >
-            <Link href="#home" className="p-2">
+            <Link href={item.link} className="p-2">
               {item.name}
             </Link>
           </li>
