@@ -11,7 +11,7 @@ import { api } from "../../../../convex/_generated/api";
 const MemeMarketPage = () => {
   const searchParams = useSearchParams();
   const addr = searchParams.get("addr");
-
+  console.log("addr:", addr);
   const meme = useQuery(api.meme.getMeme, {
     addr: Array.isArray(addr) ? addr[0] : (addr ?? ""),
   });
@@ -28,8 +28,8 @@ const MemeMarketPage = () => {
             icon={meme.icon}
             name={meme.name}
             marketCap={meme.market_cap}
-            dailyVolume={meme.volume}
-            allTimeVolume={meme.all_time_vol}
+            dailyVolume={meme.volume ?? ""}
+            allTimeVolume={meme.all_time_vol ?? ""}
           />
           <Chart />
           <Transactions />

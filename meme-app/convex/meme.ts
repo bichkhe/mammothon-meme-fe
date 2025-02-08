@@ -72,7 +72,13 @@ export const getMeme = query({
       .withIndex("by_addr", (q) => q.eq("addr", args.addr))
       .first();
     if (!meme) {
-      throw new Error(`Meme with address ${args.addr} not found`);
+      // throw new Error(`Meme with address ${args.addr} not found`);
+      return null;
+    }
+    if (meme.icon.includes("png") || meme.icon.includes("jpg")){
+      meme.icon = meme.icon;
+    }else {
+      meme.icon = (await ctx.storage.getUrl(meme.icon)) ?? ""
     }
     return meme;
   },
