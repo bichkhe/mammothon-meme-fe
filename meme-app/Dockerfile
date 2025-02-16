@@ -17,7 +17,7 @@ COPY . .
 RUN yarn build
 
 FROM node:20-alpine
-WORKDIR /app
+WORKDIR /app/meme-app
 
 RUN mv env-example .env.local
 
