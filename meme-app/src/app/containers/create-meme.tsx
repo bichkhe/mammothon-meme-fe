@@ -28,6 +28,7 @@ const formSchema = z.object({
 
 const CreateMemeContainer = () => {
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const goBack = () => {
     window.history.back();
   };
@@ -75,35 +76,55 @@ const CreateMemeContainer = () => {
     return resp;
   };
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    // Upload to IPFS
-    const storageId = await handleUpload(data.files[0]);
+    setLoading(true);
+    try {
+      console.log(data);
+      // Upload to IPFS
+      const storageId = await handleUpload(data.files[0]);
 
-    // Call to smart contract to mint this coin
-    const addr = "meme-addr";
-    // Insert to database
-    const resp2 = await createMeme({
-      meme: {
-        name: data.memeName,
-        addr: addr,
-        url: storageId,
-        icon: storageId,
-        market_cap: "1000000",
-        description: "kitto test",
-      },
-    });
-    setSuccess(true);
+      // Call to smart contract to mint this coin
+      const generateRandomString = (length: number) => {
+        const characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+        }
+        return result;
+      };
+
+      const addr = generateRandomString(10);
+      // Insert to database
+      const resp2 = await createMeme({
+        meme: {
+          name: data.memeName,
+          addr: addr,
+          url: storageId,
+          icon: storageId,
+          market_cap: "1000000",
+          description: "kitto test",
+        },
+      });
+      setSuccess(true);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center mx-auto max-w-[800px] gap-4 bg-black p-8 rounded-md mt-[200px] gap-3">
-      {!success && (
+    <div className="flex flex-col items-center justify-center mx-auto max-w-[800px] gap-4 bg-black p-8 rounded-md mt-[200px] ">
+      {loading && <div className="text-white">Minting meme...</div>}
+      {!success && !loading && (
         <>
           <h1 className="text-2xl font-bold mb-4 text-white">Create Meme</h1>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full p-10 text-white"
+              className="w-full p-10 text-white flex flex-col gap-4"
             >
               <FormField
                 control={form.control}
@@ -149,7 +170,14 @@ const CreateMemeContainer = () => {
                   );
                 }}
               />
-              <Button type="submit">Submit</Button>
+              <Button
+                type="submit"
+                color="red"
+                // className="w-full text-black font-extrabold text-md"
+                variant="default"
+              >
+                Mint
+              </Button>
             </form>
           </Form>
         </>
