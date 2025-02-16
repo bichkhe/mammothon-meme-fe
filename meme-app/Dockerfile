@@ -3,10 +3,6 @@ FROM node:20-alpine AS builder
 
 RUN apk update && apk add git && apk add --no-cache openssh
 
-RUN apt-get update && \
-    apt-get install -y openssh-server && \
-    apt-get clean
-
 # Set the working directory
 WORKDIR /app
 
