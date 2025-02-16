@@ -1,0 +1,115 @@
+name: CICD
+on:
+  push:
+    branches:
+      - main
+
+env:
+  RUST_TOOLCHAIN: stable
+  TOOLCHAIN_PROFILE: minimal
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if /opt/meme_fe directory exists
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 42.112.26.113
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            if [ ! -d /opt/meme_fe ]; then
+              mkdir -p /opt/meme_fe
+            fi
+
+      - name: Build project
+        run: |
+          docker build -t mammothon_meme_fe:latest .
+          docker save -o mammothon_meme_fe.tar mammothon_meme_fe:latest
+          ls -ld mammothon_meme_fe.tar
+          chmod 666 mammothon_meme_fe.tar
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 42.112.26.113
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: "mammothon_meme_fe.tar,.env.dev"
+          target: /opt/meme_fe
+
+      - name: Start service
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 42.112.26.113
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            docker load -i /opt/meme_fe/mammothon_meme_fe.tar
+
+            CONTAINER_NAME="mammothon_meme_fe"
+            # Check if the container exists
+            if docker ps -a --filter "name=$CONTAINER_NAME" --format '{{.Names}}' | grep -w $CONTAINER_NAME > /dev/null; then
+              echo "Container $CONTAINER_NAME exists."
+              docker stop $CONTAINER_NAME
+              docker rm $CONTAINER_NAME
+            fi
+            docker run -p 5150:5150 -d --name $CONTAINER_NAME $CONTAINER_NAME:latest
+
+  # test:
+  #   name: Run Tests
+  #   runs-on: ubuntu-latest
+
+  #   permissions:
+  #     contents: read
+
+  #   services:
+  #     redis:
+  #       image: redis
+  #       options: >-
+  #         --health-cmd "redis-cli ping"
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #       ports:
+  #         - "6379:6379"
+  #     postgres:
+  #       image: postgres
+  #       env:
+  #         POSTGRES_DB: postgres_test
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #       ports:
+  #         - "5432:5432"
+  #       # Set health checks to wait until postgres has started
+  #       options: --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+
+  #   steps:
+  #     - name: Checkout the code
+  #       uses: actions/checkout@v4
+  #     - uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         toolchain: ${{ env.RUST_TOOLCHAIN }}
+  #     - name: Setup Rust cache
+  #       uses: Swatinem/rust-cache@v2
+  #     - name: Run cargo test
+  #       uses: actions-rs/cargo@v1
+  #       with:
+  #         command: test
+  #         args: --all-features --all
+  #       env:
+  #         REDIS_URL: redis://localhost:${{job.services.redis.ports[6379]}}
+  #         DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres_test

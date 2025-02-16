@@ -19,6 +19,8 @@ RUN yarn build
 FROM node:20-alpine
 WORKDIR /app
 
+RUN mv .env.dev .env.local
+
 COPY --from=builder /app ./
 
 # Expose the port the app runs on
