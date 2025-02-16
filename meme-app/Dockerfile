@@ -10,6 +10,7 @@ RUN mv meme-app/* .
 RUN rm -rf meme-app
 RUN ls -la
 RUN pwd
+RUN mv env-example .env.local
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -24,7 +25,6 @@ RUN yarn build
 FROM node:20-alpine
 WORKDIR /app
 
-RUN mv env-example .env.local
 
 COPY --from=builder /app ./
 
