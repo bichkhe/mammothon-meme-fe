@@ -3,6 +3,7 @@ FROM node:20-alpine AS builder
 
 RUN apk update && apk add git && apk add --no-cache openssh
 
+RUN mkdir -p /root/.ssh
 RUN ssh-keygen -A
 RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
 
