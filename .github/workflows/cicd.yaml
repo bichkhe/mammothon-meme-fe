@@ -27,6 +27,7 @@ jobs:
           script: |
             CONTAINER_NAME="mammothon_meme_fe"
             if [ ! -d /opt/meme_fe ]; then
+              cd /opt
               git clone git@github.com:bichkhe/mammothon-meme-fe.git meme_fe
             fi
 
