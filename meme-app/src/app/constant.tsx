@@ -1,4 +1,5 @@
 import { Menu } from "lucide-react";
+import PoolsPage from "@/app/meme/pools/page";
 
 export const HotMemeCoins = [
   {
@@ -155,8 +156,8 @@ export const MenuItems = [
   },
   {
     name: "Pools",
-    icon: <Menu />,
-    link: "/pools",
+    icon: <PoolsPage />,
+    link: "/meme/pools",
   },
   {
     name: "Create Meme",
