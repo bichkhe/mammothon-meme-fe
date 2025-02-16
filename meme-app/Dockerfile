@@ -1,30 +1,25 @@
 # Use the official Node.js image as the base image
 FROM node:20-alpine AS builder
 
-RUN apk update && apk add git && apk add --no-cache openssh
-
-RUN mkdir -p /root/.ssh
-RUN ssh-keygen -A
-RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN apk update && apk add git
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the rest of the application code
-COPY . .
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-RUN mv meme-app/* .
-RUN rm -rf meme-app
-RUN mv env-example .env.local
-RUN ls -la
-
+# Install dependencies
 RUN yarn
 
+# Copy the rest of the application code
+COPY . .
 RUN yarn build
 
 FROM node:20-alpine
 WORKDIR /app
 
+RUN mv env-example .env.local
 
 COPY --from=builder /app ./
 
