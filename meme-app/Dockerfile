@@ -7,20 +7,21 @@ RUN apk update && apk add git
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY meme-app/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN yarn
 
 # Copy the rest of the application code
-COPY meme-app/* .
+COPY . .
 RUN yarn build
 
 FROM node:20-alpine
 WORKDIR /app
 
-COPY --from=builder /app ./
 RUN mv env-example .env.local
+
+COPY --from=builder /app ./
 
 # Expose the port the app runs on
 EXPOSE 5555
