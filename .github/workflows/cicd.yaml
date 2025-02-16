@@ -32,7 +32,7 @@ jobs:
 
       - name: Build project
         run: |
-          docker build -t mammothon_meme_fe:latest .
+          docker build -f meme-app/Dockerfile -t mammothon_meme_fe:latest .
           docker save -o mammothon_meme_fe.tar mammothon_meme_fe:latest
           ls -ld mammothon_meme_fe.tar
           chmod 666 mammothon_meme_fe.tar
