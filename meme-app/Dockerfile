@@ -19,7 +19,7 @@ RUN yarn build
 FROM node:20-alpine
 WORKDIR /app
 
-RUN mv .env.dev .env.local
+RUN mv env-example .env.local
 
 COPY --from=builder /app ./
 
