@@ -7,17 +7,17 @@ RUN apk update && apk add git
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY meme-app/package*.json ./
 
 # Install dependencies
 RUN yarn
 
 # Copy the rest of the application code
-COPY . .
+COPY meme-app/* .
 RUN yarn build
 
 FROM node:20-alpine
-WORKDIR /app/meme-app
+WORKDIR /app
 
 COPY --from=builder /app ./
 RUN mv env-example .env.local
