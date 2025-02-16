@@ -7,7 +7,7 @@ RUN apk update && apk add git
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY meme-app/package*.json ./
 
 # Install dependencies
 RUN yarn
@@ -15,11 +15,10 @@ RUN yarn
 # Copy the rest of the application code
 COPY . .
 
-RUN ls -la
-RUN pwd
 RUN mv meme-app/* .
 RUN rm -rf meme-app
 RUN mv env-example .env.local
+RUN ls -la
 
 RUN yarn build
 
