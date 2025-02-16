@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import UploadPhoto from "../components/meme-upload";
+// import UploadPhoto from "../components/meme-upload";
 
 import {
   Form,
@@ -20,6 +20,12 @@ import { z } from "zod";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Link from "next/link";
+import { useAppKitProvider, useAppKitAccount } from "@reown/appkit/react";
+import { BrowserProvider, Contract, formatUnits } from "ethers";
+import { EIP1193Provider } from "viem";
+import contractABI from "@/contracts/MyContractABI.json";
+
+const USDTAddress = "0x617f3112bf5397D0467D315cC709EF968D9ba546";
 
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
@@ -29,6 +35,9 @@ const formSchema = z.object({
 const CreateMemeContainer = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { address, caipAddress, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider("eip155");
+
   const goBack = () => {
     window.history.back();
   };
@@ -114,6 +123,20 @@ const CreateMemeContainer = () => {
       setLoading(false);
     }
   };
+
+  async function createMemeContract() {
+    if (!isConnected) throw Error("User disconnected");
+
+    const ethersProvider = new BrowserProvider(
+      walletProvider as EIP1193Provider
+    );
+    const signer = await ethersProvider.getSigner();
+    // The Contract object
+    const USDTContract = new Contract(USDTAddress, contractABI, signer);
+    const USDTBalance = await USDTContract.buy("2221xx");
+
+    console.log(formatUnits(USDTBalance, 18));
+  }
 
   return (
     <div className="flex flex-col items-center justify-center mx-auto max-w-[800px] gap-4 bg-black p-8 rounded-md mt-[200px] ">
