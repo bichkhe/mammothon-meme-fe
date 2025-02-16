@@ -6,10 +6,10 @@ RUN apk update && apk add git
 # Set the working directory
 WORKDIR /app
 
-RUN mv meme-app/* .
-RUN rm -rf meme-app
 RUN ls -la
 RUN pwd
+RUN mv meme-app/* .
+RUN rm -rf meme-app
 RUN mv env-example .env.local
 
 # Copy package.json and package-lock.json
