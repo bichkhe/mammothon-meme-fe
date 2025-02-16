@@ -1,12 +1,13 @@
 import { useReadContract } from "wagmi";
-import contractABI from "@/contracts/MyContractABI.json";
+import memeContractABI from "@/contracts/MemeContract.json";
 
-const memeContractAddress = "0x133";
-const useContract = () => {
+const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
+const useContract = (functionName: string, args: string[]) => {
   const result = useReadContract({
-    contractABI,
+    abi: memeContractABI,
     address: memeContractAddress,
-    functionName: "totalSupply",
+    functionName: functionName,
+    args: args,
   });
 
   if (result.error) {

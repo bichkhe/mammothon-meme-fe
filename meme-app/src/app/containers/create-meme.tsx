@@ -21,12 +21,13 @@ import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Link from "next/link";
 import { useAppKitProvider, useAppKitAccount } from "@reown/appkit/react";
-import { BrowserProvider, Contract, formatUnits } from "ethers";
+import { BrowserProvider, Contract, utils } from "ethers";
+// import { utils } from "ethers";
 import { EIP1193Provider } from "viem";
-import contractABI from "@/contracts/MyContractABI.json";
+// import contractABI from "@/contracts/MyContractABI.json";
+import memeContractABI from "@/contracts/MemeContract.json";
 
-const USDTAddress = "0x617f3112bf5397D0467D315cC709EF968D9ba546";
-
+const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
   files: z.instanceof(FileList),
@@ -36,6 +37,14 @@ const CreateMemeContainer = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const { address, caipAddress, isConnected } = useAppKitAccount();
+  console.log(
+    "address",
+    address,
+    "caipAddress",
+    caipAddress,
+    "isConnected",
+    isConnected
+  );
   const { walletProvider } = useAppKitProvider("eip155");
 
   const goBack = () => {
@@ -50,7 +59,7 @@ const CreateMemeContainer = () => {
   });
   const fileRef = form.register("files");
 
-  const handleUpload = async (file: any) => {
+  const handleUpload = async (file: unknown) => {
     const postUrl = await generateUploadUrl();
     const result = await fetch(postUrl, {
       method: "POST",
@@ -66,24 +75,6 @@ const CreateMemeContainer = () => {
     return storageId;
   };
 
-  const uploadImage = async (file: any) => {
-    if (!file) return;
-    const uploadUrl = `/api/post-photo?filename=${file.name}&contentType=${file.type}`;
-    console.log("uploading file:", uploadUrl);
-
-    const formData = new FormData();
-    formData.append("file", file.file);
-
-    const resp = await fetch(uploadUrl, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (resp) {
-      console.log(resp);
-    }
-    return resp;
-  };
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
@@ -106,6 +97,9 @@ const CreateMemeContainer = () => {
       };
 
       const addr = generateRandomString(10);
+
+      const result = await createMemeContract(storageId);
+      console.log("result", result);
       // Insert to database
       const resp2 = await createMeme({
         meme: {
@@ -117,14 +111,16 @@ const CreateMemeContainer = () => {
           description: "kitto test",
         },
       });
+      console.log("resp2", resp2);
       setSuccess(true);
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      console.log("error", error);
     }
   };
 
-  async function createMemeContract() {
+  async function createMemeContract(imageUrl: string) {
     if (!isConnected) throw Error("User disconnected");
 
     const ethersProvider = new BrowserProvider(
@@ -132,10 +128,55 @@ const CreateMemeContainer = () => {
     );
     const signer = await ethersProvider.getSigner();
     // The Contract object
-    const USDTContract = new Contract(USDTAddress, contractABI, signer);
-    const USDTBalance = await USDTContract.buy("2221xx");
+    const USDTContract = new Contract(
+      memeContractAddress,
+      memeContractABI,
+      signer
+    );
 
-    console.log(formatUnits(USDTBalance, 18));
+    /*
+    {
+          "name": "name",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "metadata",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "initialPrice",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "owner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+    */
+    // const salt = createSalt();
+    const amountInWei = 0.005e18; // buy 1 ETH
+    const result = await USDTContract.createMemeContract(
+      "Meme-Kitto",
+      "MKT",
+      imageUrl,
+      amountInWei,
+      utils.encodeBytes32String("hello")
+    );
+    // const amountInWei = ethers.parseUnits(amountInWei.toString(), 18);
+    console.log(result);
   }
 
   return (
