@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as meme from "../meme.js";
+import type * as meme_images from "../meme_images.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,6 +26,7 @@ import type * as meme from "../meme.js";
  */
 declare const fullApi: ApiFromModules<{
   meme: typeof meme;
+  meme_images: typeof meme_images;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

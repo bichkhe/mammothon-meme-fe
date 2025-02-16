@@ -29,7 +29,7 @@ const MemeItem = ({ icon, name, marketCap, addr }: MemeItemProps) => {
 
         <div className="flex flex-col gap-4 justify-center items-center">
           {/* <Smile className="h-12 w-12" /> */}
-          <img src={icon} alt={name} className="h-12 w-12" />
+          <img src={icon} alt={name} className="h-16 w-16" />
           <span className="text-2xl font-semibold uppercase overflow-hidden">
             {name}
           </span>

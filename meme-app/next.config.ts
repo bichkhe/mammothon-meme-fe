@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "plus.unsplash.com",
       "upload.wikimedia.org",
       "cdn-icons-png.flaticon.com",
+      "exciting-rook-385.convex.cloud",
     ],
   },
   webpack: (config) => {
