@@ -20,14 +20,22 @@ import { z } from "zod";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Link from "next/link";
-import { useAppKitProvider, useAppKitAccount } from "@reown/appkit/react";
-import { BrowserProvider, Contract, utils } from "ethers";
+import {
+  useAppKitProvider,
+  useAppKitAccount,
+  useAppKitNetwork,
+} from "@reown/appkit/react";
+import { BrowserProvider, Contract, Eip1193Provider, ethers } from "ethers";
 // import { utils } from "ethers";
-import { EIP1193Provider } from "viem";
+import type { Provider } from "@reown/appkit/react";
+
 // import contractABI from "@/contracts/MyContractABI.json";
 import memeContractABI from "@/contracts/MemeContract.json";
+// const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
+// const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
-const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
+// const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
+const memeContractAddress = "0x5d1cA17202eaf101c114903fAd2EF8F30EA95be9";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
   files: z.instanceof(FileList),
@@ -45,7 +53,19 @@ const CreateMemeContainer = () => {
     "isConnected",
     isConnected
   );
-  const { walletProvider } = useAppKitProvider("eip155");
+  const { walletProvider } = useAppKitProvider<Provider>("eip155");
+  const { caipNetwork, caipNetworkId, chainId, switchNetwork } =
+    useAppKitNetwork();
+  console.log(
+    "caipNetwork",
+    caipNetwork,
+    "caipNetworkId",
+    caipNetworkId,
+    "chainId",
+    chainId,
+    "switchNetwork",
+    switchNetwork
+  );
 
   const goBack = () => {
     window.history.back();
@@ -120,13 +140,57 @@ const CreateMemeContainer = () => {
     }
   };
 
-  async function createMemeContract(imageUrl: string) {
-    if (!isConnected) throw Error("User disconnected");
+  const getProvider = (): ethers.BrowserProvider | null => {
+    if (window.ethereum) {
+      if (window.ethereum.providers?.length) {
+        // If there are multiple providers, choose the first one or a specific provider
 
-    const ethersProvider = new BrowserProvider(
-      walletProvider as EIP1193Provider
+        console.log("window.ethereum.providers", window.ethereum.providers);
+        const provider =
+          (window.ethereum.providers as ethers.Eip1193Provider[]).find(
+            (provider) => (provider as any).isMetaMask
+          ) || (window.ethereum.providers as ethers.Eip1193Provider[])[0];
+        return new ethers.BrowserProvider(provider as ethers.Eip1193Provider);
+      } else {
+        // If there is only one provider
+        return new ethers.BrowserProvider(
+          window.ethereum as ethers.Eip1193Provider
+        );
+      }
+    } else {
+      alert(
+        "No Ethereum provider found. Please install MetaMask or another wallet."
+      );
+      return null;
+    }
+  };
+
+  // const connectWallet = async () => {
+  //   const provider = getProvider();
+  //   if (!provider) return;
+
+  //   try {
+  //     const accounts = await provider.send("eth_requestAccounts", []);
+  //     setAccount(accounts[0]);
+  //     fetchBalance(accounts[0]);
+  //   } catch (error) {
+  //     console.error("Cannot connect to Wallet:", error);
+  //   }
+  // };
+
+  async function createMemeContract(imageUrl: string) {
+    if (!isConnected && !walletProvider) throw Error("User disconnected");
+
+    // const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    const provider = new ethers.BrowserProvider(
+      window.ethereum as unknown as ethers.Eip1193Provider
     );
-    const signer = await ethersProvider.getSigner();
+    // const provider = getProvider();
+    console.log("provider:-------", provider);
+    // const ethersProvider = new BrowserProvider(
+    //   provider as unknown as Eip1193Provider
+    // );
+    const signer = await provider.getSigner();
     // The Contract object
     const USDTContract = new Contract(
       memeContractAddress,
@@ -166,14 +230,23 @@ const CreateMemeContainer = () => {
           "internalType": "bytes32"
         }
     */
+
     // const salt = createSalt();
-    const amountInWei = 0.005e18; // buy 1 ETH
+    const amountInWei = ethers.parseUnits("0.005", 18);
+    // const amountInWei = 0.005e18; // buy 1 ETH
+    console.log(
+      "ethers.encodeBytes32String",
+      ethers.encodeBytes32String("1233")
+    );
     const result = await USDTContract.createMemeContract(
-      "Meme-Kitto",
-      "MKT",
+      "Meme-Kitto1",
+      "MKT1",
       imageUrl,
       amountInWei,
-      utils.encodeBytes32String("hello")
+      address,
+      // ethers.keccak256("1233")
+      ethers.keccak256(ethers.toUtf8Bytes("MemeCoinv11"))
+      // ethers.encodeBytes32String("1233")
     );
     // const amountInWei = ethers.parseUnits(amountInWei.toString(), 18);
     console.log(result);
