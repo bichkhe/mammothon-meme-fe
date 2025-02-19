@@ -2,7 +2,7 @@ name: CICD
 on:
   push:
     branches:
-      - feature_pools
+      - main
 
 env:
   RUST_TOOLCHAIN: stable
@@ -29,6 +29,7 @@ jobs:
             if [ ! -d /opt/meme_fe ]; then
               cd /opt
               git clone git@github.com:bichkhe/mammothon-meme-fe.git meme_fe
+              git checkout main
             fi
 
             cd /opt/meme_fe/meme-app
