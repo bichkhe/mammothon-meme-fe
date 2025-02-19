@@ -2,7 +2,7 @@ name: CICD
 on:
   push:
     branches:
-      - feature_pools
+      - main
 
 env:
   RUST_TOOLCHAIN: stable
