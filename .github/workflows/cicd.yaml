@@ -33,6 +33,7 @@ jobs:
             fi
 
             cd /opt/meme_fe/meme-app
+            git pull origin main
             docker build -t $CONTAINER_NAME:latest .
 
             # Check if the container exists
