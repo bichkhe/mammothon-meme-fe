@@ -25,7 +25,6 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
           script: |
-            CONTAINER_NAME="mammothon_meme_fe"
             if [ ! -d /opt/meme_fe ]; then
               cd /opt
               git clone git@github.com:bichkhe/mammothon-meme-fe.git meme_fe
@@ -34,12 +33,6 @@ jobs:
 
             cd /opt/meme_fe/meme-app
             git pull origin main
-            docker build -t $CONTAINER_NAME:latest .
 
-            # Check if the container exists
-            if docker ps -a --filter "name=$CONTAINER_NAME" --format '{{.Names}}' | grep -w $CONTAINER_NAME > /dev/null; then
-              echo "Container $CONTAINER_NAME exists."
-              docker stop $CONTAINER_NAME
-              docker rm $CONTAINER_NAME
-            fi
-            docker run -p 5555:5555 -d --name $CONTAINER_NAME $CONTAINER_NAME:latest
+            yarn
+            nohup yarn dev > /dev/null 2>&1 &
