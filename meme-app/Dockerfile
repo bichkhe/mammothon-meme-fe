@@ -19,9 +19,9 @@ RUN yarn build
 FROM node:20-alpine
 WORKDIR /app
 
-RUN mv env-example .env.local
-
 COPY --from=builder /app ./
+
+RUN mv env-example .env.local
 
 # Expose the port the app runs on
 EXPOSE 5555
