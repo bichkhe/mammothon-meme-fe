@@ -1,7 +1,7 @@
 # Use the official Node.js image as the base image
 FROM node:20-alpine AS builder
 
-RUN apk update && apk add git
+RUN apk update && apk add git && apk add openssh
 
 # Set the working directory
 WORKDIR /app
