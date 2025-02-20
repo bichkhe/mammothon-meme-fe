@@ -47,9 +47,16 @@ jobs:
             export PATH="PATH:$YARN_DIR:$PM2_DIR"
             yarn
 
-            pm2 stop meme-fe
-            pm2 delete meme-fe
-            pm2 start "yarn dev" --name meme-fe
+            if pm2 ls | grep -q "meme-fe"; then
+              echo "The 'meme-fe' process is running."
+              pm2 delete meme-fe
+            else
+              echo "The 'meme-fe' process is not running. Starting it now..."
+              pm2 start "yarn dev" --name "meme-fe"
+            fi
+            # pm2 stop meme-fe
+            # pm2 delete meme-fe
+            # pm2 start "yarn dev" --name meme-fe
 
             # echo "Start service..."
             # yarn dev
