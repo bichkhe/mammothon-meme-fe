@@ -45,4 +45,6 @@ jobs:
 
             export PATH="PATH:$YARN_DIR"
             yarn
+
+            echo "Start service..."
             nohup yarn dev > /dev/null 2>&1 &
