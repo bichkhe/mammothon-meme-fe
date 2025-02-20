@@ -35,16 +35,20 @@ jobs:
             cd /opt/meme_fe/meme-app
             git pull origin main
 
-            PID=$(netstat -tulnp | grep :5555 | awk '{print $7}' | cut -d'/' -f1)
-            if [ -n "$PID" ]; then
-              sudo kill -9 $PID
-              echo "Process $PID running on port 5555 has been killed."
-            else
-              echo "No process is running on port 5555."
-            fi
+            # PID=$(netstat -tulnp | grep :5555 | awk '{print $7}' | cut -d'/' -f1)
+            # if [ -n "$PID" ]; then
+            #   sudo kill -9 $PID
+            #   echo "Process $PID running on port 5555 has been killed."
+            # else
+            #   echo "No process is running on port 5555."
+            # fi
 
             export PATH="PATH:$YARN_DIR"
             yarn
+
+            pm2 stop meme-fe
+            pm2 delete meme-fe
+            pm2 start "yarn dev" --name meme-fe
 
             echo "Start service..."
             yarn dev
