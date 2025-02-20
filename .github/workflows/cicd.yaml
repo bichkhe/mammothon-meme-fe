@@ -26,6 +26,7 @@ jobs:
           port: 22
           script: |
             YARN_DIR="/root/.nvm/versions/node/v20.17.0/bin"
+            PM2_DIR="/usr/local/bin"
             if [ ! -d /opt/meme_fe ]; then
               cd /opt
               git clone git@github.com:bichkhe/mammothon-meme-fe.git meme_fe
@@ -43,13 +44,13 @@ jobs:
             #   echo "No process is running on port 5555."
             # fi
 
-            export PATH="PATH:$YARN_DIR"
+            export PATH="PATH:$YARN_DIR:$PM2_DIR"
             yarn
 
             pm2 stop meme-fe
             pm2 delete meme-fe
             pm2 start "yarn dev" --name meme-fe
 
-            echo "Start service..."
-            yarn dev
+            # echo "Start service..."
+            # yarn dev
             # nohup yarn dev > /dev/null 2>&1 &
