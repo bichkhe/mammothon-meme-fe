@@ -52,7 +52,7 @@ export const submitBlob = async (dataSubmit: string) => {
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJwdWJsaWMiLCJyZWFkIiwid3JpdGUiLCJhZG1pbiJdLCJOb25jZSI6IjVLUGFXYVVGYW5TTlMwTk40Z1RqUk1QcUJWc0JRbDVRYWhmUGZ5UkhoNlk9IiwiRXhwaXJlc0F0IjoiMDAwMS0wMS0wMVQwMDowMDowMFoifQ.SxkCtdFk1sk87YGFh8GPgkExMi4BHTLsGj0ifiqAyCI";
     const client = new Client(url, token);
     const blob: blob.Blob = {
-        namespace : "DEADBEEFabcdef1234567890abcdef1234567890",
+        namespace : "AAAAAAAAAAAAAAAAAAAAAAAAAAECAwQFBgcICRA=",
         data : dataSubmit,
         share_version : 1,
         commitment : calculateCommitment(dataSubmit),
