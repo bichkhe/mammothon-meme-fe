@@ -1,6 +1,6 @@
 import { Client } from "cntsc";
 import { blob } from "cntsc/dist/src/types/blob";
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { MerkleTree } from "merkletreejs";
 import crypto from "crypto";
 import contractABI from "@/contracts/MemeCoin.json";
@@ -10,37 +10,38 @@ const SEPOLIA_RPC_URL = "wss://base-sepolia.g.alchemy.com/v2/W79MhAzo3-xz0UkhUU1
 interface Transaction{
     from: string,
     isBuy: boolean,
-    amountETH: number,
-    amountToken: number,
+    amountETH: string,
+    amountToken: string,
     time: Date
 }
 export const TrackHistory = (address: string) =>  {
-    const provider = new ethers.WebSocketProvider(SEPOLIA_RPC_URL);
     const contract = new ethers.Contract(
         address,
         contractABI.abi,
-        provider
+        wallet
     );
-    contract.once("Buy", (buyer, amountETH, amountToken) => {
+    contract.on("Buy", async (buyer, amountETH, amountToken) => {
         const transaction: Transaction = {
             from: buyer,
             isBuy: true,
-            amountETH: amountETH,
-            amountToken: amountToken,
+            amountETH: amountETH.toString(),
+            amountToken: amountToken.toString(),
             time: new Date()
         }
-        submitBlob(JSON.stringify(transaction));
+        const commitment= await submitBlob(JSON.stringify(transaction));
+        await saveTx(commitment, contract);
         console.log("Buy event detected:", transaction);
     })
-    contract.once("Sell", (seller, amountETH, amountToken) => {
+    contract.on("Sell",async (seller, amountETH, amountToken) => {
         const transaction: Transaction = {
             from: seller,
             isBuy: false,
-            amountETH: amountETH,
-            amountToken: amountToken,
+            amountETH: amountETH.toString(),
+            amountToken: amountToken.toString(),
             time: new Date()
         }
-        submitBlob(JSON.stringify(transaction));
+        const commitment = await submitBlob(JSON.stringify(transaction));
+        await saveTx(commitment, contract);
         console.log("Sell event detected:", transaction);
     })
     return contract;
@@ -57,8 +58,11 @@ export const submitBlob = async (dataSubmit: string) => {
         commitment : calculateCommitment(dataSubmit),
         index : 1,
     }
-    client.Blob.Submit([blob], 0.001);
-
+    console.log(blob)
+    const proof = await client.Blob.Submit([blob], 0.001);
+    console.log(proof)
+    // save to contract 
+    return blob.commitment;
 }
 function calculateCommitment(data: string) {
     const sha256 = (data: string) => crypto.createHash('sha256').update(data).digest('hex');
@@ -73,47 +77,21 @@ function calculateCommitment(data: string) {
     console.log("Commitment:", commitment);
     return commitment;
 }
+export const saveTx = async (commitment: string, contract: Contract) =>{
+    const tx = await contract.logTransaction(commitment);
+    await tx.wait();
+}
+const provider = new ethers.WebSocketProvider(SEPOLIA_RPC_URL);
+const wallet = new ethers.Wallet("264e1588d831f9645f61d94c68c62e7b5467e4ea59bdc0e6fd05452698ac8eb4", provider);
 
 export const StartTracking = async () => {
     console.log("Starting to track history...");
-    const provider = new ethers.WebSocketProvider(SEPOLIA_RPC_URL);
-    const contract = new ethers.Contract(
-        "0xA7CEc61f5Ca4E7e77e85eD44724be6ED9059040C",
-        contractABI.abi,
-        provider
-    );
-provider.send("eth_subscribe", ["logs", { 
-    address: "0xA7CEc61f5Ca4E7e77e85eD44724be6ED9059040C",
-    topics: [] // Lọc event cụ thể nếu cần
-}]).then(subscriptionId => {
-    console.log("📡 Subscribed to logs:", subscriptionId);
-}).catch(error => console.error("❌ Subscription error:", error));
-
-    contract.on("Buy", (buyer, amountETH, amountToken) => {
-        const transaction: Transaction = {
-            from: buyer,
-            isBuy: true,
-            amountETH: amountETH,
-            amountToken: amountToken,
-            time: new Date()
-        }
-        //submitBlob(JSON.stringify(transaction));
-        console.log("Buy event detected:", transaction);
-    })
-    contract.on("Sell", (seller, amountETH, amountToken) => {
-        const transaction: Transaction = {
-            from: seller,
-            isBuy: false,
-            amountETH: amountETH,
-            amountToken: amountToken,
-            time: new Date()
-        }
-        //submitBlob(JSON.stringify(transaction));
-        console.log("Sell event detected:", transaction);
-    })
+    const address = ["0xcd3F14D8BD72ABD05D85b61908f400d855Bd21a0", "0x4A397667D792A891AFee36A9C795C49b44877495"]
+    const contracts = address.map((addr) => TrackHistory(addr));
+    console.log("✅ Tracking started for contracts: ", contracts.length);
     // Tạo interval để giữ chương trình chạy
     setInterval(() => {
-        console.log("✅ Server is still running... ", contract.getAddress());
+        console.log("✅ Server is still running... ");
     }, 30_000); // Mỗi 30s log một lần
     await new Promise(() => {}); // Chặn tiến trình kết thúc
 }
