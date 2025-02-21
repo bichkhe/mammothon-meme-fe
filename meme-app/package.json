@@ -43,6 +43,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "thirdweb": "^5.61.6",
+    "tsx": "^4.19.3",
     "use-debounce": "^10.0.4",
     "viem": "^2.22.17",
     "wagmi": "^2.14.9",

@@ -78,25 +78,17 @@ export const StartTracking = async () => {
     console.log("Starting to track history...");
     const provider = new ethers.WebSocketProvider(SEPOLIA_RPC_URL);
     const contract = new ethers.Contract(
-        "0xb248eee0F286F15D5Dc491f535b7f0fC561D8Afa",
+        "0xA7CEc61f5Ca4E7e77e85eD44724be6ED9059040C",
         contractABI.abi,
         provider
     );
-provider.websocket.onopen = () => {
-    console.log("✅ WebSocket connected!");
-};
-provider.websocket.onerror = () => {
-    console.log("❌ WebSocket disconnected!");
-};
-
 provider.send("eth_subscribe", ["logs", { 
-    address: "0xb248eee0F286F15D5Dc491f535b7f0fC561D8Afa",
+    address: "0xA7CEc61f5Ca4E7e77e85eD44724be6ED9059040C",
     topics: [] // Lọc event cụ thể nếu cần
 }]).then(subscriptionId => {
     console.log("📡 Subscribed to logs:", subscriptionId);
 }).catch(error => console.error("❌ Subscription error:", error));
 
-console.log("🔍 Contract ABI:", contractABI.abi);
     contract.on("Buy", (buyer, amountETH, amountToken) => {
         const transaction: Transaction = {
             from: buyer,
@@ -105,7 +97,7 @@ console.log("🔍 Contract ABI:", contractABI.abi);
             amountToken: amountToken,
             time: new Date()
         }
-        submitBlob(JSON.stringify(transaction));
+        //submitBlob(JSON.stringify(transaction));
         console.log("Buy event detected:", transaction);
     })
     contract.on("Sell", (seller, amountETH, amountToken) => {
@@ -116,7 +108,7 @@ console.log("🔍 Contract ABI:", contractABI.abi);
             amountToken: amountToken,
             time: new Date()
         }
-        submitBlob(JSON.stringify(transaction));
+        //submitBlob(JSON.stringify(transaction));
         console.log("Sell event detected:", transaction);
     })
     // Tạo interval để giữ chương trình chạy
