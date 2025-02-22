@@ -105,4 +105,27 @@ export const createMeme = mutation({
   },
 });
 
-
+export const getTransaction = mutation({
+  args: {
+    memecoin:v.id("memes"),
+    take: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const transactions = await ctx.db.query("transactions").withIndex("by_memecoin").filter((q) =>q.eq(q.field("memecoin"),args.memecoin)).collect();
+    return transactions;
+  },
+});
+export const saveTransaction = mutation({
+  args: {
+    memecoin:v.id("memes"),
+    commitment:v.string(),
+    block_height:v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("transactions",{
+      memecoin:args.memecoin,
+      commitment:args.commitment,
+      block_height:args.block_height,
+    });
+  },
+});

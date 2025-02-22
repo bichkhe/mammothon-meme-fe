@@ -47,19 +47,21 @@ export const TrackHistory = (address: string) =>  {
     return contract;
     }
 
+
 export const submitBlob = async (dataSubmit: string) => {
     const url = "https://flying-minnow-discrete.ngrok-free.app";
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJwdWJsaWMiLCJyZWFkIiwid3JpdGUiLCJhZG1pbiJdLCJOb25jZSI6IjVLUGFXYVVGYW5TTlMwTk40Z1RqUk1QcUJWc0JRbDVRYWhmUGZ5UkhoNlk9IiwiRXhwaXJlc0F0IjoiMDAwMS0wMS0wMVQwMDowMDowMFoifQ.SxkCtdFk1sk87YGFh8GPgkExMi4BHTLsGj0ifiqAyCI";
     const client = new Client(url, token);
+    const commitment = calculateCommitment(dataSubmit);
+    
     const blob: blob.Blob = {
         namespace : "AAAAAAAAAAAAAAAAAAAAAAAAAAECAwQFBgcICRA=",
-        data : dataSubmit,
+        data : Buffer.from(dataSubmit, "utf-8").toString('base64'),
         share_version : 1,
-        commitment : calculateCommitment(dataSubmit),
-        index : 1,
+        commitment :Buffer.from(commitment, 'hex').toString('base64'),
     }
     console.log(blob)
-    const proof = await client.Blob.Submit([blob], 0.001);
+    const proof = await client.Blob.Submit([blob], 100);
     console.log(proof)
     // save to contract 
     return blob.commitment;

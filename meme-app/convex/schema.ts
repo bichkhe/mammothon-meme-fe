@@ -45,5 +45,10 @@ const schema = defineSchema({
     image: v.string(),
     created_at: v.string(),
   }).index("by_url", ["image"]),
+  transactions: defineTable({
+    memecoin: v.id("memes"),
+    commitment:v.string(),
+    block_height:v.number(),
+  }).index("by_memecoin", ["memecoin"]),
 });
 export default schema;
