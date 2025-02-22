@@ -35,7 +35,8 @@ import memeContractABI from "@/contracts/MemeContract.json";
 // const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
 // const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
-const memeContractAddress = "0x5d1cA17202eaf101c114903fAd2EF8F30EA95be9";
+// const memeContractAddress = "0x5d1cA17202eaf101c114903fAd2EF8F30EA95be9";
+const memeContractAddress = "0x3a8D97356D47b5BBE2e42E3e7827C0915f3dB7e4";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
   files: z.instanceof(FileList),
@@ -140,30 +141,30 @@ const CreateMemeContainer = () => {
     }
   };
 
-  const getProvider = (): ethers.BrowserProvider | null => {
-    if (window.ethereum) {
-      if (window.ethereum.providers?.length) {
-        // If there are multiple providers, choose the first one or a specific provider
+  // const getProvider = (): ethers.BrowserProvider | null => {
+  //   if (window.ethereum) {
+  //     if (window.ethereum.providers?.length) {
+  //       // If there are multiple providers, choose the first one or a specific provider
 
-        console.log("window.ethereum.providers", window.ethereum.providers);
-        const provider =
-          (window.ethereum.providers as ethers.Eip1193Provider[]).find(
-            (provider) => (provider as any).isMetaMask
-          ) || (window.ethereum.providers as ethers.Eip1193Provider[])[0];
-        return new ethers.BrowserProvider(provider as ethers.Eip1193Provider);
-      } else {
-        // If there is only one provider
-        return new ethers.BrowserProvider(
-          window.ethereum as ethers.Eip1193Provider
-        );
-      }
-    } else {
-      alert(
-        "No Ethereum provider found. Please install MetaMask or another wallet."
-      );
-      return null;
-    }
-  };
+  //       console.log("window.ethereum.providers", window.ethereum.providers);
+  //       const provider =
+  //         (window.ethereum.providers as ethers.Eip1193Provider[]).find(
+  //           (provider) => (provider as any).isMetaMask
+  //         ) || (window.ethereum.providers as ethers.Eip1193Provider[])[0];
+  //       return new ethers.BrowserProvider(provider as ethers.Eip1193Provider);
+  //     } else {
+  //       // If there is only one provider
+  //       return new ethers.BrowserProvider(
+  //         window.ethereum as ethers.Eip1193Provider
+  //       );
+  //     }
+  //   } else {
+  //     alert(
+  //       "No Ethereum provider found. Please install MetaMask or another wallet."
+  //     );
+  //     return null;
+  //   }
+  // };
 
   // const connectWallet = async () => {
   //   const provider = getProvider();
@@ -199,7 +200,7 @@ const CreateMemeContainer = () => {
     );
 
     /*
-    {
+        {
           "name": "name",
           "type": "string",
           "internalType": "string"
@@ -250,6 +251,7 @@ const CreateMemeContainer = () => {
     );
     // const amountInWei = ethers.parseUnits(amountInWei.toString(), 18);
     console.log(result);
+    return result;
   }
 
   return (
