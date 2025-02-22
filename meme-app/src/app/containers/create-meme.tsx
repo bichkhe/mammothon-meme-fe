@@ -34,16 +34,23 @@ import memeContractABI from "@/contracts/MemeContract.json";
 // const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
 // const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
-// const memeContractAddress = "0xf3DB161c2Af54157772e734fb17f6bC1217D36A5";
-// const memeContractAddress = "0x5d1cA17202eaf101c114903fAd2EF8F30EA95be9";
 const memeContractAddress = "0x3a8D97356D47b5BBE2e42E3e7827C0915f3dB7e4";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
+  initialPrice: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)), {
+      message: "Initial price must be a valid number",
+    })
+    .refine((val) => parseFloat(val) <= 5, {
+      message: "Initial price must be less than or equal to 5",
+    }),
   files: z.instanceof(FileList),
 });
 
 const CreateMemeContainer = () => {
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { address, caipAddress, isConnected } = useAppKitAccount();
   console.log(
@@ -67,6 +74,17 @@ const CreateMemeContainer = () => {
     "switchNetwork",
     switchNetwork
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _generateRandomString = (length: number) => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
 
   const goBack = () => {
     window.history.back();
@@ -102,30 +120,22 @@ const CreateMemeContainer = () => {
       console.log(data);
       // Upload to IPFS
       const storageId = await handleUpload(data.files[0]);
-
-      // Call to smart contract to mint this coin
-      const generateRandomString = (length: number) => {
-        const characters =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-          result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-          );
-        }
-        return result;
-      };
-
-      const addr = generateRandomString(10);
-
-      const result = await createMemeContract(storageId);
-      console.log("result", result);
+      const shortName = data.memeName.substring(0, 5).toUpperCase();
+      const contractAddress = await createMemeContract(
+        data.memeName,
+        shortName,
+        data.initialPrice,
+        storageId
+      );
+      if (!contractAddress) {
+        throw new Error("Failed to create meme contract");
+      }
+      console.log("contractAddress:xxx", contractAddress);
       // Insert to database
       const resp2 = await createMeme({
         meme: {
           name: data.memeName,
-          addr: addr,
+          addr: contractAddress || "failed",
           url: storageId,
           icon: storageId,
           market_cap: "1000000",
@@ -179,87 +189,61 @@ const CreateMemeContainer = () => {
   //   }
   // };
 
-  async function createMemeContract(imageUrl: string) {
+  async function createMemeContract(
+    memeName: string,
+    memeSymbol: string,
+    initialPrice: string,
+    imageUrl: string
+  ) {
     if (!isConnected && !walletProvider) throw Error("User disconnected");
-
-    // const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
-    const provider = new ethers.BrowserProvider(
-      window.ethereum as unknown as ethers.Eip1193Provider
-    );
-    // const provider = getProvider();
-    console.log("provider:-------", provider);
-    // const ethersProvider = new BrowserProvider(
-    //   provider as unknown as Eip1193Provider
-    // );
-    const signer = await provider.getSigner();
-    // The Contract object
-    const USDTContract = new Contract(
-      memeContractAddress,
-      memeContractABI,
-      signer
-    );
-
-    /*
-        {
-          "name": "name",
-          "type": "string",
-          "internalType": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string",
-          "internalType": "string"
-        },
-        {
-          "name": "metadata",
-          "type": "string",
-          "internalType": "string"
-        },
-        {
-          "name": "initialPrice",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "owner",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "_salt",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-    */
-
-    // const salt = createSalt();
-    const amountInWei = ethers.parseUnits("0.005", 18);
-    // const amountInWei = 0.005e18; // buy 1 ETH
-    console.log(
-      "ethers.encodeBytes32String",
-      ethers.encodeBytes32String("1233")
-    );
-    const result = await USDTContract.createMemeContract(
-      "Meme-Kitto1",
-      "MKT1",
-      imageUrl,
-      amountInWei,
-      address,
-      // ethers.keccak256("1233")
-      ethers.keccak256(ethers.toUtf8Bytes("MemeCoinv11"))
-      // ethers.encodeBytes32String("1233")
-    );
-    // const amountInWei = ethers.parseUnits(amountInWei.toString(), 18);
-    console.log(result);
-    return result;
+    try {
+      // const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+      const provider = new ethers.BrowserProvider(
+        window.ethereum as unknown as ethers.Eip1193Provider
+      );
+      // const provider = getProvider();
+      // const ethersProvider = new BrowserProvider(
+      //   provider as unknown as Eip1193Provider
+      // );
+      const signer = await provider.getSigner();
+      // The Contract object
+      const USDTContract = new Contract(
+        memeContractAddress,
+        memeContractABI,
+        signer
+      );
+      // const salt = createSalt();
+      const initialPriceInGwei = ethers.parseUnits(initialPrice, 18);
+      // const amountInWei = 0.005e18; // buy 1 ETH
+      const result = await USDTContract.createMemeContract(
+        memeName,
+        memeSymbol,
+        imageUrl,
+        initialPriceInGwei,
+        address,
+        ethers.keccak256(ethers.toUtf8Bytes(memeSymbol))
+      );
+      // we sleep 5 seconds to wait for the transaction to be mined
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const transaction = await provider.getTransactionReceipt(result.hash);
+      if (transaction == undefined || transaction.logs.length == 0) {
+        return null;
+      }
+      return transaction.logs[0].address;
+    } catch (error) {
+      console.error("Cannot connect to Wallet:", error);
+      setError(error as unknown);
+      return null;
+    }
   }
-
   return (
     <div className="flex flex-col items-center justify-center mx-auto max-w-[800px] gap-4 bg-black p-8 rounded-md mt-[200px] ">
       {loading && <div className="text-white">Minting meme...</div>}
-      {!success && !loading && (
+      {!success && !loading && !error && (
         <>
-          <h1 className="text-2xl font-bold mb-4 text-white">Create Meme</h1>
+          <h1 className="text-2xl font-bold mb-4 text-white">
+            Create Meme Contract
+          </h1>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -275,6 +259,23 @@ const CreateMemeContainer = () => {
                       <Input
                         type="text"
                         placeholder="Enter meme name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="initialPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Initial Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Initial Price (in ETH). Eg: 0.005, maximum: 5"
                         {...field}
                       />
                     </FormControl>
@@ -311,9 +312,10 @@ const CreateMemeContainer = () => {
               />
               <Button
                 type="submit"
-                color="red"
+                // color="red"
                 // className="w-full text-black font-extrabold text-md"
                 variant="default"
+                className="font-extrabold text-md bg-red-600 hover:bg-red-500 mt-4"
               >
                 Mint
               </Button>
@@ -328,6 +330,11 @@ const CreateMemeContainer = () => {
           <Button className="bg-green-500 text-white font-bold">
             <Link href="/meme/trading"> Trading</Link>
           </Button>
+        </div>
+      )}
+      {error && (
+        <div className="text-white font-bold text-2xl">
+          Failed to create meme coin <Button onClick={goBack}>Go back</Button>
         </div>
       )}
     </div>
