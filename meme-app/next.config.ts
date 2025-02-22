@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       "upload.wikimedia.org",
       "cdn-icons-png.flaticon.com",
       "exciting-rook-385.convex.cloud",
+      "scintillating-jellyfish-359.convex.cloud",
     ],
   },
   webpack: (config) => {
