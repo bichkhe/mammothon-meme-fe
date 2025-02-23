@@ -16,7 +16,7 @@ export default function MemeCoinLogo({
       <Image
         src={src}
         alt={alt}
-        className="rounded-full"
+        // className="rounded-full"
         width={size}
         height={size}
       />

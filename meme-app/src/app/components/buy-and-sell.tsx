@@ -19,6 +19,14 @@ export default function BuyAndSell() {
   const isBuyModeRef = useRef(isBuyMode);
   const balanceRef = useRef(balance);
 
+  // Tạo kiểu mở rộng Eip1193Provider với các thuộc tính riêng của ví
+  interface ExtendedEip1193Provider extends ethers.Eip1193Provider {
+    isMetaMask?: boolean;
+    isCoinbaseWallet?: boolean;
+    isTrust?: boolean;
+    isBraveWallet?: boolean;
+  }
+
   // Connect wallet
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -26,14 +34,47 @@ export default function BuyAndSell() {
       return;
     }
     try {
-      const provider = new ethers.BrowserProvider(
-        window.ethereum as unknown as ethers.Eip1193Provider
-      );
+      let provider: ethers.BrowserProvider | null = null;
+
+      if (Array.isArray(window.ethereum.providers)) {
+        // Ưu tiên chọn MetaMask khi có nhiều provider
+        const metamaskProvider = window.ethereum.providers.find(
+          (p: ExtendedEip1193Provider) => p.isMetaMask
+        );
+        if (metamaskProvider) {
+          provider = new ethers.BrowserProvider(metamaskProvider);
+          console.log("Selected MetaMask provider");
+        } else {
+          // Nếu không tìm thấy MetaMask, chọn provider đầu tiên
+          provider = new ethers.BrowserProvider(
+            window.ethereum.providers[0] as ethers.Eip1193Provider
+          );
+          console.log("Selected first available provider");
+        }
+      } else {
+        // Nếu chỉ có một provider
+        provider = new ethers.BrowserProvider(
+          window.ethereum as unknown as ethers.Eip1193Provider
+        );
+        console.log("Selected single provider");
+      }
+
+      if (!provider) {
+        alert("No provider available!");
+        return;
+      }
+
       const accounts = await provider.send("eth_requestAccounts", []);
-      setAccount(accounts[0]);
-      fetchBalance(accounts[0]);
+      if (accounts.length > 0) {
+        setAccount(accounts[0]);
+        console.log("Connected Account:", accounts[0]);
+        fetchBalance(accounts[0]);
+      } else {
+        console.warn("No accounts found.");
+      }
     } catch (error) {
       console.error("Cannot connect to Wallet:", error);
+      alert("Failed to connect to MetaMask.");
     }
   };
 
@@ -42,13 +83,40 @@ export default function BuyAndSell() {
     const checkWalletConnection = async () => {
       if (window.ethereum) {
         try {
-          const provider = new ethers.BrowserProvider(
-            window.ethereum as unknown as ethers.Eip1193Provider
-          );
-          const accounts = await provider.send("eth_accounts", []);
-          if (accounts.length > 0) {
-            setAccount(accounts[0]);
-            fetchBalance(accounts[0]);
+          let provider: ethers.BrowserProvider | null = null;
+
+          if (Array.isArray(window.ethereum.providers)) {
+            // Ưu tiên chọn MetaMask khi có nhiều provider
+            const metamaskProvider = window.ethereum.providers.find(
+              (p: ExtendedEip1193Provider) => p.isMetaMask
+            );
+            if (metamaskProvider) {
+              provider = new ethers.BrowserProvider(metamaskProvider);
+              console.log("Selected MetaMask provider");
+            } else {
+              // Nếu không tìm thấy MetaMask, chọn provider đầu tiên
+              provider = new ethers.BrowserProvider(
+                window.ethereum.providers[0] as ethers.Eip1193Provider
+              );
+              console.log("Selected first available provider");
+            }
+          } else {
+            // Nếu chỉ có một provider
+            provider = new ethers.BrowserProvider(
+              window.ethereum as unknown as ethers.Eip1193Provider
+            );
+            console.log("Selected single provider");
+          }
+
+          if (provider) {
+            const accounts = await provider.send("eth_requestAccounts", []);
+            if (accounts.length > 0) {
+              setAccount(accounts[0]);
+              console.log("Connected Account:", accounts[0]);
+              fetchBalance(accounts[0]);
+            } else {
+              console.warn("No accounts found.");
+            }
           }
         } catch (error) {
           console.error("Cannot check wallet connection:", error);
