@@ -9,6 +9,8 @@ from web3.providers import AsyncHTTPProvider
 from eth_account import Account
 from merkly.mtree import MerkleTree
 import celestia_node
+from convex import ConvexClient
+import web3 as w3
 # Config
 SEPOLIA_RPC_URL = "https://base-sepolia.g.alchemy.com/v2/W79MhAzo3-xz0UkhUU1Vx4CWNl7UkQ8W"
 PRIVATE_KEY = "264e1588d831f9645f61d94c68c62e7b5467e4ea59bdc0e6fd05452698ac8eb4"
@@ -19,16 +21,25 @@ options_json = {
     "fee": 10000,
     "gas_limit": 100000
 }
-
-# Init
+CONVEX_URL = "https://dazzling-dalmatian-501.convex.cloud"
+FACTORY_ADDRESS = "0x852D5141abd7A73eA82a8350f7942998db10213f"
+convex_client = ConvexClient(CONVEX_URL)
 web3 = AsyncWeb3(AsyncHTTPProvider(SEPOLIA_RPC_URL))
 wallet = Account.from_key(PRIVATE_KEY)
 node = celestia_node.Client(CELESTIA_NODE_URL, CELESTIA_TOKEN)
-
 with open("src/contracts/MemeCoin.json") as f:
-    CONTRACT_ABI = json.load(f)["abi"]
+    MEME_ABI = json.load(f)["abi"]
+    
+with open("src/contracts/ContractFactory.json") as f:
+    FACTORY_ABI = json.load(f)["abi"]
+factory_contract = web3.eth.contract(address=FACTORY_ADDRESS, abi=FACTORY_ABI)
 
-async def calculate_commitment(data: str) -> str:
+# get all contract from convex
+contracts = convex_client.query("meme:get")
+
+# format contract to some thing difference
+
+def calculate_commitment(data: str) -> str:
     print(f"Calculating commitment for {data}")
     chunks = [data[i:i+256] for i in range(0, len(data), 256)]
     hashed = [hashlib.sha256(c.encode()).hexdigest() for c in chunks]
@@ -36,9 +47,18 @@ async def calculate_commitment(data: str) -> str:
         hashed.append(hashed[0])
     return MerkleTree(hashed).root
 
-async def submit_blob(data: str) -> str:
+async def save_tx(commitment, block_height, contract_address):
+    print(f"Saving tx {commitment} for contract {contract_address}")
+    convex_client.mutation("meme:saveTransaction", dict(
+        address = contract_address,
+        commitment = base64.b64encode(commitment).decode("utf-8"),
+        block_height = block_height,
+    ))
+    print(f"Saving tx {commitment} for contract {contract_address}")
+
+async def submit_blob(data: str) -> tuple[str, int]:
     # Implement Celestia API call properly
-    commitment = await calculate_commitment(data)
+    commitment = calculate_commitment(data)
     commit = base64.b64encode(commitment).decode()
     data_encode = base64.b64encode(data.encode()).decode()
     print(f"Calculated commitment {commitment} and result {commit}")
@@ -52,65 +72,48 @@ async def submit_blob(data: str) -> str:
     ]
     submitted_blob = celestia_node.Blob(node).submit(blob, options_json)
     print(f"Submitted blob {commitment} with heigh {str(submitted_blob)}")
-    return commitment
-async def save_tx(commitment, contract_address):
-    contract = web3.eth.contract(address=contract_address, abi=CONTRACT_ABI)
-    nonce = await web3.eth.get_transaction_count(wallet.address)
-    gas = await web3.eth.gas_price
-    # Gọi hàm logTransaction
-    txn = await contract.functions.logTransaction(commitment).build_transaction({
-        "from": wallet.address,
-        "nonce": nonce,
-        "gas": 200000,
-        "gasPrice": gas,
-    })
-    
-    print(f"Transaction data: {txn}")
-    # Ký giao dịch
-    signed_txn = web3.eth.account.sign_transaction(txn, PRIVATE_KEY)
-
-    # Gửi giao dịch
-    tx_hash = await web3.eth.send_raw_transaction(signed_txn.raw_transaction)
-    hash = web3.to_hex(tx_hash)
-    print(f"Giao dịch đang được gửi, hash: {hash}")
-
-    # Chờ xác nhận giao dịch
-    receipt = await web3.eth.wait_for_transaction_receipt(tx_hash)
-    print(f"Giao dịch hoàn tất: {receipt.transactionHash.hex()}")
-    # Implement properly
+    return (commitment, submitted_blob)
+async def save_tx(commitment, block_height, contract_address):
+    print(f"Saving tx {commitment} for contract {contract_address}")
+    convex_client.mutation("meme:saveTransaction", dict(
+        address = contract_address,
+        commitment = base64.b64encode(commitment).decode("utf-8"),
+        block_height = block_height,
+    ))
     print(f"Saving tx {commitment} for contract {contract_address}")
     
 async def handle_buy_event(event):
     args = event["args"]
     print(f"Handling buy event {args}")
     tx_data = {
-        "from": args["buyer"],
-        "amountETH": str(args["amountETH"]),
-        "amountToken": str(args["amountToken"]),
-        "timestamp": str(time.time()),
+        "sender": args["buyer"],
+        "eth": str(args["amountETH"]),
+        "amount": str(args["amountToken"]),
+        "time": str(time.time()),
+        "t_type": 0
     }
-    commitment = await submit_blob(json.dumps(tx_data))
-    await save_tx(commitment, event["address"])
+    result = await submit_blob(json.dumps(tx_data))
+    await save_tx(result[0],result[1] , event["address"])
 async def handle_sell_event(event):
     args = event["args"]
     print(f"Handling sell event {args}")
     tx_data = {
-        "from": args["seller"],
-        "amountETH": str(args["amountETH"]),
-        "amountToken": str(args["amountToken"]),
-        "timestamp": str(time.time()),
+        "sender": args["seller"],
+        "eth": str(args["amountETH"]),
+        "amount": str(args["amountToken"]),
+        "time": str(time.time()),
+        "t_type": 1
     }
     commitment = await submit_blob(json.dumps(tx_data))
     await save_tx(commitment, event["address"])
+async def log_loop(event_filter, handler):
+    while True:
+        events = await event_filter.get_new_entries()
+        for event in events:
+            await handler(event)
+        await asyncio.sleep(2)
 async def listen_contract(address):
-    contract = web3.eth.contract(address=address, abi=CONTRACT_ABI)
-    
-    async def log_loop(event_filter, handler):
-        while True:
-            events = await event_filter.get_new_entries()
-            for event in events:
-                await handler(event)
-            await asyncio.sleep(2)
+    contract = web3.eth.contract(address=address, abi=MEME_ABI)
     print(f"Listening to {address}")
     buy_filter = await contract.events.Buy.create_filter(from_block="latest")
     sell_filter = await contract.events.Sell.create_filter(from_block="latest")
@@ -119,10 +122,32 @@ async def listen_contract(address):
         log_loop(buy_filter, handle_buy_event),
         log_loop(sell_filter, handle_sell_event)  # Define similar
     )
+    
+async def on_new_contract(event):
+    print(f"New contract {event}")
+    args = event["args"]
+    address = args["contractAddress"]
+    print(f"New contract {address}")
+    CONTRACT_ADDRESSES.append(address)
+    await listen_contract(address)
+    
+async def listen_new_contract():
+    print("Listening to new contract")
+    new_contract_filter = await factory_contract.events.ContractCreated.create_filter(from_block="latest")
+    await log_loop(new_contract_filter, on_new_contract)
+
+
 
 async def main():
+     # Tạo một tác vụ để lắng nghe contract mới
+    listen_new_contract_task = asyncio.create_task(listen_new_contract())
+    
+    # Tạo các tác vụ để lắng nghe các contract hiện có
     tasks = [listen_contract(addr) for addr in CONTRACT_ADDRESSES]
-    await asyncio.gather(*tasks)
-
+    
+    # Chạy song song tất cả các tác vụ
+    await asyncio.gather(listen_new_contract_task, *tasks)
+    
+    
 if __name__ == "__main__":
     asyncio.run(main())

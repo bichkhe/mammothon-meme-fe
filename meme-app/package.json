@@ -27,7 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cntsc": "github:ashishbhintade/cntsc",
-    "convex": "^1.18.2",
+    "convex": "^1.19.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "ethers": "^6.13.5",
