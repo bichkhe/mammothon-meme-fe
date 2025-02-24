@@ -22,8 +22,10 @@ const schema = defineSchema({
     url: v.string(),
     addr: v.string(),
     icon: v.string(),
+    current_minted_token:v.optional(v.int64()),
     market_cap: v.string(),
     price: v.optional(v.string()),
+    all_time_price: v.optional(v.string()),
     volume: v.optional(v.string()),
     all_time_vol: v.optional(v.string()),
     change24h: v.optional(v.string()),
@@ -45,5 +47,10 @@ const schema = defineSchema({
     image: v.string(),
     created_at: v.string(),
   }).index("by_url", ["image"]),
+  transactions: defineTable({
+    coin_address: v.optional(v.string()),
+    commitment:v.string(),
+    block_height:v.number(),
+  }).index("by_memecoin", ["coin_address"]),
 });
 export default schema;
