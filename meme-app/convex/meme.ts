@@ -128,3 +128,36 @@ export const saveTransaction = mutation({
     });
   },
 });
+export const updateContract = mutation({
+  args: {
+    address:v.string(),
+    ethAmount:v.string(),
+    price:v.string(),
+    token_buy: v.int64()
+  },
+  handler: async (ctx, args) => {
+    const meme = await ctx.db.query("memes").withIndex("by_addr").filter((q) =>q.eq(q.field("addr"),args.address)).first();
+    if (!meme) {
+      throw new Error(`Meme with address ${args.address} not found`);
+    }
+    const new_all_time_price = args.price ? parseFloat(args.price) : 0;
+    const last_all_time_price = meme.all_time_price ? parseFloat(meme.all_time_price) : 0;
+    meme.current_minted_token =  meme.current_minted_token? meme.current_minted_token + args.token_buy : args.token_buy; 
+    const new_all_time_vol = parseFloat(args.ethAmount) + parseFloat(meme.all_time_vol ?? "0");
+    if (new_all_time_price > last_all_time_price){
+      await ctx.db.patch(meme._id, {
+        all_time_vol:new_all_time_vol.toString(),
+        price:args.price,
+        all_time_price:args.price,
+        updated_at:new Date().toISOString(),
+      });
+    }
+    else{
+      await ctx.db.patch(meme._id, {
+        all_time_vol:new_all_time_price.toString(),
+        price:args.price,
+        updated_at:new Date().toISOString(),
+        current_minted_token:meme.current_minted_token,
+      });
+    }
+  }});

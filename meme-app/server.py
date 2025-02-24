@@ -22,7 +22,7 @@ options_json = {
     "gas_limit": 100000
 }
 CONVEX_URL = "https://dazzling-dalmatian-501.convex.cloud"
-FACTORY_ADDRESS = "0x852D5141abd7A73eA82a8350f7942998db10213f"
+FACTORY_ADDRESS = "0x44ce89145a6BF2E4EBe908AD1dD755Dc72d7B3d7"
 convex_client = ConvexClient(CONVEX_URL)
 web3 = AsyncWeb3(AsyncHTTPProvider(SEPOLIA_RPC_URL))
 wallet = Account.from_key(PRIVATE_KEY)
@@ -36,9 +36,10 @@ factory_contract = web3.eth.contract(address=FACTORY_ADDRESS, abi=FACTORY_ABI)
 
 # get all contract from convex
 contracts = convex_client.query("meme:get")
-
+print(contracts)
 # format contract to some thing difference
-
+for contract in contracts:
+    CONTRACT_ADDRESSES.append(contract["addr"])
 def calculate_commitment(data: str) -> str:
     print(f"Calculating commitment for {data}")
     chunks = [data[i:i+256] for i in range(0, len(data), 256)]
@@ -92,8 +93,17 @@ async def handle_buy_event(event):
         "time": str(time.time()),
         "t_type": 0
     }
+    price = args["price"]
+    print(f"Price {price}")
     result = await submit_blob(json.dumps(tx_data))
+    convex_client.mutation("meme:updateContract", dict(
+        address = event["address"],
+        ethAmount = str(args["amountETH"]),
+        price = str(args["price"]),
+        token_buy = args["amountToken"],
+    ))
     await save_tx(result[0],result[1] , event["address"])
+    
 async def handle_sell_event(event):
     args = event["args"]
     print(f"Handling sell event {args}")
@@ -104,6 +114,15 @@ async def handle_sell_event(event):
         "time": str(time.time()),
         "t_type": 1
     }
+    price = args["price"]
+    print(f"Price {price}")
+    result = await submit_blob(json.dumps(tx_data))
+    convex_client.mutation("meme:updateContract", dict(
+        address = event["address"],
+        ethAmount = str(args["amountETH"]),
+        price = str(args["price"]),
+        token_buy = -args["amountToken"],
+    ))
     commitment = await submit_blob(json.dumps(tx_data))
     await save_tx(commitment, event["address"])
 async def log_loop(event_filter, handler):
@@ -147,7 +166,6 @@ async def main():
     
     # Chạy song song tất cả các tác vụ
     await asyncio.gather(listen_new_contract_task, *tasks)
-    
     
 if __name__ == "__main__":
     asyncio.run(main())
