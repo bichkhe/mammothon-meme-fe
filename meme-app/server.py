@@ -21,7 +21,7 @@ options_json = {
     "fee": 10000,
     "gas_limit": 100000
 }
-CONVEX_URL = "https://dazzling-dalmatian-501.convex.cloud"
+CONVEX_URL = "https://scintillating-jellyfish-359.convex.cloud"
 FACTORY_ADDRESS = "0x44ce89145a6BF2E4EBe908AD1dD755Dc72d7B3d7"
 convex_client = ConvexClient(CONVEX_URL)
 web3 = AsyncWeb3(AsyncHTTPProvider(SEPOLIA_RPC_URL))

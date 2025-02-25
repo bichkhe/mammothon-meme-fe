@@ -24,10 +24,12 @@
     "@thirdweb-dev/sdk": "^4.0.99",
     "@walletconnect/web3-provider": "^1.8.0",
     "@web3modal/wallet": "^5.1.11",
+    "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cntsc": "github:ashishbhintade/cntsc",
     "convex": "^1.19.2",
+    "date-fns": "^4.1.0",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "ethers": "^6.13.5",
@@ -62,5 +64,6 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "proxy": "https://flying-minnow-discrete.ngrok-free.app"
 }

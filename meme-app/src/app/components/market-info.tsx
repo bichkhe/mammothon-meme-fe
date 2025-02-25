@@ -24,19 +24,19 @@ const MarketInfo = ({
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
             MARKET CAP
           </h3>
-          <p className="text-xl text-cyan-500">{marketCap} $</p>
+          <p className="text-xl text-cyan-500">{marketCap} ETH</p>
         </div>
         <div>
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
             24 HOUR VOL
           </h3>
-          <p className="text-xl text-cyan-500">{dailyVolume} APT</p>
+          <p className="text-xl text-cyan-500">{dailyVolume} ETH</p>
         </div>
         <div>
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
             ALL-TIME VOL
           </h3>
-          <p className="text-xl text-cyan-500">{allTimeVolume} APT</p>
+          <p className="text-xl text-cyan-500">{allTimeVolume} ETH</p>
         </div>
       </div>
     </div>
