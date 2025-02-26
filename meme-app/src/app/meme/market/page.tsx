@@ -135,8 +135,10 @@ const MemeMarketPage = () => {
             marketCap={meme.market_cap ?? ""}
             dailyVolume={meme.volume ?? ""}
             allTimeVolume={meme.all_time_vol ?? ""}
+            currentMintedToken={Number(meme.current_minted_token ?? 0)}
+            price={meme.price ?? "0"}
           />
-          <Chart />
+          <Chart decodedDataArray={decodedDataArray} />
           <Transactions decodedDataArray={decodedDataArray} />
         </div>
         <div className="w-full md:w-1/4">

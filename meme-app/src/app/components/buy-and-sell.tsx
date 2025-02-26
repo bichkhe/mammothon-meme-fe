@@ -211,7 +211,9 @@ export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
           console.log(`Sell success! Transaction: ${tx.hash}`);
           fetchBalance(account, addr); // Cập nhật số dư sau khi mua
           onEventEnd();
-          resetForm();
+          const updatedBalance = await contract.balanceOf(account);
+          setAmount(parseFloat(updatedBalance));
+          calculateReceivedToken(parseFloat(updatedBalance), addr);
         } else {
           alert("Transaction failed!");
           console.log("Transaction failed!");
@@ -225,19 +227,8 @@ export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
         );
 
         if (typeof error === "object" && error !== null && "message" in error) {
-          console.error("Error message:", error.message);
-          if ("code" in error && error.code === "ACTION_REJECTED") {
-            console.error("Error code:", error.code);
-            alert("Transaction was rejected by the user.");
-          } else if ("code" in error && error.code === "CALL_EXCEPTION") {
-            alert("Transaction failed! Please check your balance.");
-          } else if ("code" in error && error.code === "INVALID_ARGUMENT") {
-            alert("Transaction failed! Invalid amount.");
-          } else {
-            alert(
-              "An unexpected error occurred while processing the transaction."
-            );
-          }
+          console.error("Transaction failed! ", error.message);
+          alert("Transaction failed! " + error.message);
         }
       } else {
         console.error("Unknown error:", error);
@@ -275,7 +266,21 @@ export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
         setReceived(parseFloat(ethers.formatEther(received)));
       }
     } catch (error) {
-      console.error("Cannot get received token:", error);
+      if (error instanceof Error) {
+        console.error(
+          "Get received token error:",
+          JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+        );
+
+        if (typeof error === "object" && error !== null && "message" in error) {
+          console.error("Cannot get received token:", error.message);
+          alert("Cannot get received token! " + error.message);
+        }
+      } else {
+        console.error("Unknown error:", error);
+        alert("An unknown error occurred.");
+      }
+      setReceived(0);
     }
   };
 
@@ -316,6 +321,13 @@ export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
     }
   }, [isBuyMode, addr]);
 
+  const formatNumber = (value: number) => {
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 10,
+    });
+  };
+
   return (
     <div className="bg-black p-4 rounded-lg text-white space-y-4 shadow-md border border-gray-700 max-w-sm mx-auto">
       <div className="space-y-3">
@@ -347,8 +359,8 @@ export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
             You receive
           </label>
           <input
-            type="number"
-            value={received}
+            type="text"
+            value={formatNumber(received)}
             readOnly
             className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 cursor-not-allowed"
           />
