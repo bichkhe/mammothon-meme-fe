@@ -23,7 +23,7 @@ const MarketInfo = ({
   const formatAmount = (amount: string) => {
     return parseFloat(amount).toLocaleString(undefined, {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 20,
     });
   };
 

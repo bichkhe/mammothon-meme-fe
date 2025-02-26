@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { ethers } from "ethers";
 
 interface DecodedData {
   sender: string;
@@ -22,7 +23,7 @@ export default function Transactions({ decodedDataArray }: TransactionsProps) {
   const formatAmount = (amount: string) => {
     return parseFloat(amount).toLocaleString(undefined, {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 20,
     });
   };
 
@@ -47,7 +48,7 @@ export default function Transactions({ decodedDataArray }: TransactionsProps) {
             >
               <td className="px-4 py-2 whitespace-nowrap">{index + 1}</td>
               <td className="px-4 py-2 whitespace-nowrap">
-                {formatAmount(tx.eth)}
+                {formatAmount(ethers.formatEther(tx.eth))}
               </td>
               <td className="px-4 py-2 whitespace-nowrap">
                 {formatAmount(tx.amount)}
@@ -56,7 +57,7 @@ export default function Transactions({ decodedDataArray }: TransactionsProps) {
                 {formatTime(tx.time)}
               </td>
               <td className="px-4 py-2 text-green-400 whitespace-nowrap">
-                {tx.price}
+                {formatAmount(ethers.formatEther(tx.price))}
               </td>
               <td className="px-4 py-2 truncate whitespace-nowrap">
                 {tx.sender}

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { createChart, IChartApi, CandlestickSeries } from "lightweight-charts";
+import { ethers } from "ethers";
 
 interface DecodedData {
   sender: string;
@@ -20,6 +21,7 @@ export default function Chart({ decodedDataArray }: TransactionsProps) {
   const chartRef = useRef<IChartApi | null>(null);
 
   const convertToChartData = (decodedDataArray: DecodedData[]) => {
+    // console.log("Decoded data array:", decodedDataArray);
     const groupedData = decodedDataArray.reduce(
       (acc, curr) => {
         const date = new Date(parseFloat(curr.time) * 1000)
@@ -36,10 +38,22 @@ export default function Chart({ decodedDataArray }: TransactionsProps) {
 
     const chartData = Object.keys(groupedData).map((date) => {
       const dayData = groupedData[date];
-      const open = parseFloat(dayData[0].price);
-      const close = parseFloat(dayData[dayData.length - 1].price);
-      const high = Math.max(...dayData.map((d) => parseFloat(d.price)));
-      const low = Math.min(...dayData.map((d) => parseFloat(d.price)));
+      const open = parseFloat(
+        ethers.formatEther(parseFloat(dayData[0].price || "0"))
+      );
+      const close = parseFloat(
+        ethers.formatEther(parseFloat(dayData[dayData.length - 1].price || "0"))
+      );
+      const high = parseFloat(
+        ethers.formatEther(
+          Math.max(...dayData.map((d) => parseFloat(d.price || "0")))
+        )
+      );
+      const low = parseFloat(
+        ethers.formatEther(
+          Math.min(...dayData.map((d) => parseFloat(d.price || "0")))
+        )
+      );
 
       return {
         time: date,
@@ -83,9 +97,14 @@ export default function Chart({ decodedDataArray }: TransactionsProps) {
         borderVisible: false,
         wickUpColor: "#26a69a",
         wickDownColor: "#ef5350",
+        priceFormat: {
+          type: "custom",
+          formatter: (price: number) => price.toFixed(15), // Hiển thị 15 chữ số thập phân
+        },
       });
 
       const data = convertToChartData(decodedDataArray);
+      // console.log("Data for chart:", data);
       candlestickSeries.setData(data);
 
       chartRef.current.timeScale().fitContent();

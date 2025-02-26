@@ -54,12 +54,12 @@ const getAllFromCelestia = async (
       }
     );
 
-    console.log("Data from Celestia:", response);
+    // console.log("Data from Celestia:", response);
     const resultArray = response.data.result;
     const decodedDataArray: DecodedData[] = resultArray.map(
       (item: CelestiaResponse) => {
         const decodedData = decodeBase64(item.data);
-        console.log("Data:", decodedData);
+        // console.log("Data:", decodedData);
         return decodedData;
       }
     );
@@ -81,45 +81,56 @@ const MemeMarketPage = () => {
   const [decodedDataArray, setDecodedDataArray] = useState<DecodedData[]>([]);
 
   useEffect(() => {
-    if (addr) {
-      console.log("Component mounted, triggering get transaction event.");
-      (async () => {
+    const fetchTransactions = async () => {
+      if (addr) {
+        // console.log("Fetching transactions...");
         const response = await getTransaction({ address: addr });
-        console.log("Get transactions response:", response);
+        // console.log("Get transactions response:", response);
         const allDecodedData: DecodedData[] = [];
         for (const transaction of response) {
-          console.log("Transaction:", transaction);
+          // console.log("Transaction:", transaction);
           const decodedData = await getAllFromCelestia(
             transaction.block_height
           );
           allDecodedData.push(...decodedData);
-          setDecodedDataArray((prevData) => [...prevData, ...decodedData]);
         }
-      })();
-    }
-  }, [addr, getTransaction]);
+        setDecodedDataArray(allDecodedData);
+      }
+    };
 
-  useEffect(() => {
-    if (buyOrSellEvent && addr) {
+    if (buyOrSellEvent) {
+      setDecodedDataArray([]);
       // Thực hiện hành động khi sự kiện từ Buy or Sell kết thúc
       console.log("Buy or Sell event ended, triggering get transaction event.");
-      (async () => {
-        const response = await getTransaction({ address: addr });
-        console.log("Get transactions response:", response);
-        const allDecodedData: DecodedData[] = [];
-        for (const transaction of response) {
-          console.log("Transaction:", transaction);
-          const decodedData = await getAllFromCelestia(
-            transaction.block_height
-          );
-          allDecodedData.push(...decodedData);
-          setDecodedDataArray((prevData) => [...prevData, ...decodedData]);
-        }
-      })();
-      // Reset lại buyOrSellEvent
+      fetchTransactions();
       setBuyOrSellEvent(false);
     }
   }, [buyOrSellEvent, addr, getTransaction]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (addr) {
+        // console.log("Fetching transactions...");
+        const response = await getTransaction({ address: addr });
+        // console.log("Get transactions response:", response);
+        const allDecodedData: DecodedData[] = [];
+        for (const transaction of response) {
+          // console.log("Transaction:", transaction);
+          const decodedData = await getAllFromCelestia(
+            transaction.block_height
+          );
+          allDecodedData.push(...decodedData);
+        }
+        setDecodedDataArray(allDecodedData);
+      }
+    };
+
+    const interval = setInterval(() => {
+      fetchTransactions();
+    }, 10000); // Polling every 10 seconds
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [addr, getTransaction]);
 
   if (!meme) {
     return <div>Loading...</div>;
