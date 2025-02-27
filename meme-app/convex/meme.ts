@@ -93,6 +93,8 @@ export const createMeme = mutation({
       market_cap: v.string(),
       icon: v.string(),
       url: v.string(),
+      price: v.string(),
+      last_swap_at: v.optional(v.string()),
       description: v.optional(v.string()),
     }),
   },

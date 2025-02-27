@@ -31,6 +31,7 @@ import type { Provider } from "@reown/appkit/react";
 
 // import contractABI from "@/contracts/MyContractABI.json";
 import memeContractABI from "@/contracts/MemeContract.json";
+import { set } from "lodash";
 // const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
 // const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
@@ -53,6 +54,7 @@ const CreateMemeContainer = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { address, caipAddress, isConnected } = useAppKitAccount();
+  const [lastMemeContract, setLastMemeContract] = useState("");
   console.log(
     "address",
     address,
@@ -131,6 +133,7 @@ const CreateMemeContainer = () => {
         throw new Error("Failed to create meme contract");
       }
       console.log("contractAddress:xxx", contractAddress);
+      setLastMemeContract(contractAddress);
       // Insert to database
       const resp2 = await createMeme({
         meme: {
@@ -138,8 +141,8 @@ const CreateMemeContainer = () => {
           addr: contractAddress || "failed",
           url: storageId,
           icon: storageId,
-          market_cap: "1000000",
-          description: "kitto test",
+          price: data.initialPrice,
+          market_cap: "0",
         },
       });
       console.log("resp2", resp2);
@@ -328,7 +331,13 @@ const CreateMemeContainer = () => {
           You created a meme coin successfully{" "}
           <Button onClick={goBack}>Go back</Button>
           <Button className="bg-green-500 text-white font-bold">
-            <Link href="/meme/trading"> Trading</Link>
+            {!lastMemeContract && <Link href={`/meme`}> Trading</Link>}
+            {lastMemeContract && (
+              <Link href={`/meme/market?addr=${lastMemeContract}`}>
+                {" "}
+                Trading
+              </Link>
+            )}
           </Button>
         </div>
       )}

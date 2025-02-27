@@ -8,8 +8,10 @@ interface MemeItemProps {
   icon: string;
   name: string;
   marketCap: string;
+  price: string;
+  last_swap_at: string;
 }
-const MemeItem = ({ icon, name, marketCap, addr }: MemeItemProps) => {
+const MemeItem = ({ icon, name, marketCap, addr, price }: MemeItemProps) => {
   const router = useRouter();
 
   const handleRedirect = () => {
@@ -44,9 +46,9 @@ const MemeItem = ({ icon, name, marketCap, addr }: MemeItemProps) => {
         </div>
         <div className="flex flex-col">
           <span className="body-sm font-forma text-light-gray group-hover:text-ec-blue uppercase p-[1px] transition-all font-thin text-slate-500">
-            Last swap
+            Last Price
           </span>
-          <span className="text-sm text-cyan-500">0.99 APT</span>
+          <span className="text-sm text-cyan-500">{price}</span>
         </div>
       </div>
     </div>

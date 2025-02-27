@@ -21,6 +21,8 @@ const MemeList = () => {
                 name: string;
                 market_cap: string;
                 addr: string;
+                price: string;
+                last_swap: string;
               },
               index: React.Key | null | undefined
             ) => (
@@ -30,6 +32,8 @@ const MemeList = () => {
                 name={meme.name}
                 marketCap={meme.market_cap}
                 addr={meme.addr}
+                price={meme.price}
+                last_swap={meme.last_swap_at}
               />
             )
           )}
