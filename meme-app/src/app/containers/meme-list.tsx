@@ -23,6 +23,7 @@ const MemeList = () => {
                 addr: string;
                 price: string;
                 last_swap: string;
+                current_minted_token: number;
               },
               index: React.Key | null | undefined
             ) => (
@@ -34,6 +35,7 @@ const MemeList = () => {
                 addr={meme.addr}
                 price={meme.price}
                 last_swap={meme.last_swap_at}
+                current_minted_token={meme.current_minted_token}
               />
             )
           )}
