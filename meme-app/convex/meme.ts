@@ -133,7 +133,7 @@ export const updateContract = mutation({
     address:v.string(),
     ethAmount:v.string(),
     price:v.string(),
-    token_buy: v.int64()
+    token_buy: v.number()
   },
   handler: async (ctx, args) => {
     const meme = await ctx.db.query("memes").withIndex("by_addr").filter((q) =>q.eq(q.field("addr"),args.address)).first();
