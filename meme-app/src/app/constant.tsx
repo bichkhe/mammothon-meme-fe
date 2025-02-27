@@ -167,7 +167,7 @@ export const MenuItems = [
   {
     name: "Docs",
     icon: <Menu />,
-    link: "/docs",
+    link: "/meme/docs",
   },
   {
     name: "About",
