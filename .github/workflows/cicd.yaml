@@ -42,10 +42,11 @@ jobs:
             export PATH="PATH:$YARN_DIR:$PM2_DIR:$GREP_DIR"
 
             yarn
+            yarn build
             if pm2 ls | grep -q "meme-fe"; then
               echo "The 'meme-fe' process is running."
               pm2 delete meme-fe
             else
               echo "The 'meme-fe' process is not running. Starting it now..."
             fi
-            pm2 start "yarn dev" --name "meme-fe"
+            pm2 start "yarn start -p 5555" --name "meme-fe"
