@@ -5,11 +5,16 @@ import { ethers } from "ethers";
 import contractABI from "@/contracts/MemeCoin.json";
 import { debounce } from "lodash";
 
-const CONTRACT_ADDRESS = "0xef7655770f76676B4323ddEb84ac5e1FfB7F6F7A";
+// const CONTRACT_ADDRESS = "0xef7655770f76676B4323ddEb84ac5e1FfB7F6F7A";
 const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
 const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
-export default function BuyAndSell() {
+interface BuyAndSellData {
+  addr: string;
+  onEventEnd: () => void;
+}
+
+export default function BuyAndSell({ addr, onEventEnd }: BuyAndSellData) {
   const [received, setReceived] = useState<number>(0);
   const [isBuyMode, setIsBuyMode] = useState<boolean>(true);
   const [amount, setAmount] = useState<number | null>(null);
@@ -68,7 +73,7 @@ export default function BuyAndSell() {
       if (accounts.length > 0) {
         setAccount(accounts[0]);
         console.log("Connected Account:", accounts[0]);
-        fetchBalance(accounts[0]);
+        fetchBalance(accounts[0], addr);
       } else {
         console.warn("No accounts found.");
       }
@@ -113,7 +118,7 @@ export default function BuyAndSell() {
             if (accounts.length > 0) {
               setAccount(accounts[0]);
               console.log("Connected Account:", accounts[0]);
-              fetchBalance(accounts[0]);
+              fetchBalance(accounts[0], addr);
             } else {
               console.warn("No accounts found.");
             }
@@ -125,16 +130,12 @@ export default function BuyAndSell() {
     };
 
     checkWalletConnection();
-  }, []);
+  }, [addr]);
 
-  const fetchBalance = async (userAddress: string) => {
+  const fetchBalance = async (userAddress: string, addr: string) => {
     try {
       const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        contractABI.abi,
-        provider
-      );
+      const contract = new ethers.Contract(addr, contractABI.abi, provider);
       const balance = await contract.balanceOf(userAddress);
       setBalance(parseFloat(balance));
       console.log("User Address:", userAddress);
@@ -161,11 +162,7 @@ export default function BuyAndSell() {
         window.ethereum as unknown as ethers.Eip1193Provider
       );
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        contractABI.abi,
-        signer
-      );
+      const contract = new ethers.Contract(addr, contractABI.abi, signer);
 
       if (isBuyMode) {
         const amountInWei = ethers.parseUnits(amount.toString(), 18);
@@ -198,13 +195,13 @@ export default function BuyAndSell() {
         if (receipt.status === 1) {
           alert(`Buy success! Transaction: ${tx.hash}`);
           console.log(`Buy success! Transaction: ${tx.hash}`);
-          fetchBalance(account); // Cập nhật số dư sau khi mua
+          fetchBalance(account, addr); // Cập nhật số dư sau khi mua
+          onEventEnd();
+          resetForm();
         } else {
           alert("Transaction failed!");
           console.log("Transaction failed!");
         }
-
-        resetForm();
       } else {
         const tx = await contract.sell(amount);
         console.log("Transaction was sent:", tx.hash);
@@ -212,12 +209,15 @@ export default function BuyAndSell() {
         if (receipt.status === 1) {
           alert(`Sell success! Transaction: ${tx.hash}`);
           console.log(`Sell success! Transaction: ${tx.hash}`);
-          fetchBalance(account); // Cập nhật số dư sau khi mua
+          fetchBalance(account, addr); // Cập nhật số dư sau khi mua
+          onEventEnd();
+          const updatedBalance = await contract.balanceOf(account);
+          setAmount(parseFloat(updatedBalance));
+          calculateReceivedToken(parseFloat(updatedBalance), addr);
         } else {
           alert("Transaction failed!");
           console.log("Transaction failed!");
         }
-        resetForm();
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -227,19 +227,8 @@ export default function BuyAndSell() {
         );
 
         if (typeof error === "object" && error !== null && "message" in error) {
-          console.error("Error message:", error.message);
-          if ("code" in error && error.code === "ACTION_REJECTED") {
-            console.error("Error code:", error.code);
-            alert("Transaction was rejected by the user.");
-          } else if ("code" in error && error.code === "CALL_EXCEPTION") {
-            alert("Transaction failed! Please check your balance.");
-          } else if ("code" in error && error.code === "INVALID_ARGUMENT") {
-            alert("Transaction failed! Invalid amount.");
-          } else {
-            alert(
-              "An unexpected error occurred while processing the transaction."
-            );
-          }
+          console.error("Transaction failed! ", error.message);
+          alert("Transaction failed! " + error.message);
         }
       } else {
         console.error("Unknown error:", error);
@@ -257,15 +246,11 @@ export default function BuyAndSell() {
     debouncedSetAmount(value);
   };
 
-  const calculateReceivedToken = async (value: number | null) => {
+  const calculateReceivedToken = async (value: number | null, addr: string) => {
     if (!contractABI.abi || value === null || value <= 0) return;
     try {
       const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        contractABI.abi,
-        provider
-      );
+      const contract = new ethers.Contract(addr, contractABI.abi, provider);
       console.log("Current value of isBuyMode:", isBuyModeRef.current);
       if (isBuyModeRef.current) {
         const valueInWei = ethers.parseUnits(value.toString(), 18);
@@ -281,13 +266,27 @@ export default function BuyAndSell() {
         setReceived(parseFloat(ethers.formatEther(received)));
       }
     } catch (error) {
-      console.error("Cannot get received token:", error);
+      if (error instanceof Error) {
+        console.error(
+          "Get received token error:",
+          JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+        );
+
+        if (typeof error === "object" && error !== null && "message" in error) {
+          console.error("Cannot get received token:", error.message);
+          alert("Cannot get received token! " + error.message);
+        }
+      } else {
+        console.error("Unknown error:", error);
+        alert("An unknown error occurred.");
+      }
+      setReceived(0);
     }
   };
 
   const debouncedSetAmount = useCallback(
     debounce((value: number | null) => {
-      calculateReceivedToken(value);
+      calculateReceivedToken(value, addr);
     }, 500),
     []
   );
@@ -318,9 +317,16 @@ export default function BuyAndSell() {
       setReceived(0);
     } else {
       setAmount(balanceRef.current);
-      calculateReceivedToken(balanceRef.current);
+      calculateReceivedToken(balanceRef.current, addr);
     }
-  }, [isBuyMode]);
+  }, [isBuyMode, addr]);
+
+  const formatNumber = (value: number) => {
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 10,
+    });
+  };
 
   return (
     <div className="bg-black p-4 rounded-lg text-white space-y-4 shadow-md border border-gray-700 max-w-sm mx-auto">
@@ -353,8 +359,8 @@ export default function BuyAndSell() {
             You receive
           </label>
           <input
-            type="number"
-            value={received}
+            type="text"
+            value={formatNumber(received)}
             readOnly
             className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 cursor-not-allowed"
           />

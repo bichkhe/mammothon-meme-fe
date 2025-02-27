@@ -22,7 +22,7 @@ const schema = defineSchema({
     url: v.string(),
     addr: v.string(),
     icon: v.string(),
-    current_minted_token:v.optional(v.number()),
+    current_minted_token:v.optional(v.int64()),
     market_cap: v.string(),
     price: v.optional(v.string()),
     all_time_price: v.optional(v.string()),
