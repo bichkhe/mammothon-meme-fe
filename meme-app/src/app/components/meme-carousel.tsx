@@ -50,7 +50,10 @@ const MemeCarousel = ({ memes }: MemeCarouselProps) => {
                   </div>
                   <div className="text-md text-white font-extralight">
                     Market cap:{" "}
-                    {(meme.price * meme.current_minted_token) / 1e18} ETH
+                    {meme.current_minted_token &&
+                      meme.price &&
+                      (meme.price * meme.current_minted_token) / 1e18}
+                    {!meme.current_minted_token && meme.price / 1e18} ETH
                   </div>
                   {/* <div className="text-md text-white font-extralight">
                     Change 24h: {meme.change}
