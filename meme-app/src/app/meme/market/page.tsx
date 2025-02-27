@@ -125,6 +125,8 @@ const MemeMarketPage = () => {
       }
     };
 
+    fetchTransactions();
+
     const interval = setInterval(() => {
       fetchTransactions();
     }, 10000); // Polling every 10 seconds
