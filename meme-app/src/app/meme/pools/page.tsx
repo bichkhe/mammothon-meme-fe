@@ -105,13 +105,8 @@ const PoolsPage = () => {
   ]);
 
   return (
-    <div className="mt-2 flex h-full">
-      <div className="w-[60%] flex justify-center border-r-1">
-        <PoolsTable data={poolData} />
-      </div>
-      <div className="w-[40%] flex justify-center">
-        <AddLiquidity />
-      </div>
+    <div className="flex h-full items-center justify-center">
+      <h1 className="text-4xl font-bold">Coming Soon...</h1>
     </div>
   );
 };

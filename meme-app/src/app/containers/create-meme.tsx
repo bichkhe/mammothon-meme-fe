@@ -89,7 +89,7 @@ const CreateMemeContainer = () => {
   };
 
   const goBack = () => {
-    window.history.back();
+window.history.back();
   };
   const generateUploadUrl = useMutation(api.meme_images.generateUploadUrl);
   // const sendImage = useMutation(api.meme_images.sendImage);
