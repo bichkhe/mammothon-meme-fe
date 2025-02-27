@@ -10,8 +10,15 @@ interface MemeItemProps {
   marketCap: string;
   price: string;
   last_swap_at: string;
+  current_minted_token: number;
 }
-const MemeItem = ({ icon, name, marketCap, addr, price }: MemeItemProps) => {
+const MemeItem = ({
+  icon,
+  name,
+  addr,
+  price,
+  current_minted_token,
+}: MemeItemProps) => {
   const router = useRouter();
 
   const handleRedirect = () => {
@@ -42,13 +49,19 @@ const MemeItem = ({ icon, name, marketCap, addr, price }: MemeItemProps) => {
           <span className="body-sm  text-light-gray group-hover:text-ec-blue uppercase p-[1px] transition-all font-thin text-slate-500">
             Market Cap
           </span>
-          <span className="text-sm text-cyan-500">{marketCap}$</span>
+          <span className="text-sm text-cyan-500">
+            {current_minted_token &&
+              price &&
+              (price * current_minted_token) / 1e18}
+            {!current_minted_token && price && price / 1e18}
+            ETH
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="body-sm font-forma text-light-gray group-hover:text-ec-blue uppercase p-[1px] transition-all font-thin text-slate-500">
             Last Price
           </span>
-          <span className="text-sm text-cyan-500">{price}</span>
+          <span className="text-sm text-cyan-500">{price / 1e18} ETH</span>
         </div>
       </div>
     </div>

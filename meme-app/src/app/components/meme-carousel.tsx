@@ -1,5 +1,4 @@
 "use client";
-
 import { CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -11,8 +10,13 @@ import Image from "next/image";
 
 import React from "react";
 import { HotMemeCoins } from "../constant";
-
-const MemeCarousel = () => {
+type MemeCarouselProps = {
+  memes: any;
+};
+const MemeCarousel = ({ memes }: MemeCarouselProps) => {
+  if (!memes) {
+    return null;
+  }
   return (
     <Carousel
       className="w-full h-[400px] mx-auto"
@@ -23,7 +27,7 @@ const MemeCarousel = () => {
       ]}
     >
       <CarouselContent>
-        {HotMemeCoins.map((meme, index) => (
+        {memes.map((meme: any, index: number) => (
           <CarouselItem key={index}>
             <div className="p-1">
               <CardContent className="flex items-center justify-center p-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-w-screen gap-12">
@@ -42,14 +46,18 @@ const MemeCarousel = () => {
                     {meme.symbol}
                   </div>
                   <div className="text-md text-white font-extralight">
-                    Market cap: {meme.market_cap}
+                    Last Price: {meme.price / 1e18}ETH
                   </div>
                   <div className="text-md text-white font-extralight">
-                    All time volume: {meme.all_time_vol}
+                    Market cap:{" "}
+                    {meme.current_minted_token &&
+                      meme.price &&
+                      (meme.price * meme.current_minted_token) / 1e18}
+                    {!meme.current_minted_token && meme.price / 1e18} ETH
                   </div>
-                  <div className="text-md text-white font-extralight">
+                  {/* <div className="text-md text-white font-extralight">
                     Change 24h: {meme.change}
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </div>
