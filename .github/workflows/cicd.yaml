@@ -27,8 +27,6 @@ jobs:
           script: |
             YARN_DIR="/root/.nvm/versions/node/v20.17.0/bin"
             PM2_DIR="/usr/local/bin"
-            GREP_DIR="/usr/bin"
-
             if [ ! -d /opt/meme_fe ]; then
               cd /opt
               git clone git@github.com:bichkhe/mammothon-meme-fe.git meme_fe
@@ -38,13 +36,28 @@ jobs:
             cd /opt/meme_fe/meme-app
             git pull origin main
 
-            export PATH="PATH:$YARN_DIR:$PM2_DIR:$GREP_DIR"
+            # PID=$(netstat -tulnp | grep :5555 | awk '{print $7}' | cut -d'/' -f1)
+            # if [ -n "$PID" ]; then
+            #   sudo kill -9 $PID
+            #   echo "Process $PID running on port 5555 has been killed."
+            # else
+            #   echo "No process is running on port 5555."
+            # fi
 
+            export PATH="PATH:$YARN_DIR:$PM2_DIR"
             yarn
+
             if pm2 ls | grep -q "meme-fe"; then
               echo "The 'meme-fe' process is running."
               pm2 delete meme-fe
             else
               echo "The 'meme-fe' process is not running. Starting it now..."
+              pm2 start "yarn dev" --name "meme-fe"
             fi
-            pm2 start "yarn dev" --name "meme-fe"
+            # pm2 stop meme-fe
+            # pm2 delete meme-fe
+            # pm2 start "yarn dev" --name meme-fe
+
+            # echo "Start service..."
+            # yarn dev
+            # nohup yarn dev > /dev/null 2>&1 &
