@@ -34,7 +34,7 @@ import memeContractABI from "@/contracts/MemeContract.json";
 // const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
 // const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
-const memeContractAddress = "0x3a8D97356D47b5BBE2e42E3e7827C0915f3dB7e4";
+const memeContractAddress = "0x9563E05970a900022AF0DFfB5aD7eA0B99025bA8";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
   initialPrice: z

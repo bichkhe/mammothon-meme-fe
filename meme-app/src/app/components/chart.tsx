@@ -1,10 +1,71 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { createChart, IChartApi, CandlestickSeries } from "lightweight-charts";
+import { ethers } from "ethers";
 
-export default function Chart() {
+interface DecodedData {
+  sender: string;
+  eth: string;
+  amount: string;
+  time: string;
+  t_type: string;
+  price: string;
+}
+
+interface TransactionsProps {
+  decodedDataArray: DecodedData[];
+}
+
+export default function Chart({ decodedDataArray }: TransactionsProps) {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
+
+  const convertToChartData = (decodedDataArray: DecodedData[]) => {
+    // console.log("Decoded data array:", decodedDataArray);
+    const groupedData = decodedDataArray.reduce(
+      (acc, curr) => {
+        const date = new Date(parseFloat(curr.time) * 1000)
+          .toISOString()
+          .split("T")[0];
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(curr);
+        return acc;
+      },
+      {} as Record<string, DecodedData[]>
+    );
+
+    const chartData = Object.keys(groupedData).map((date) => {
+      const dayData = groupedData[date];
+      const open = parseFloat(
+        ethers.formatEther(parseFloat(dayData[0].price || "0"))
+      );
+      const close = parseFloat(
+        ethers.formatEther(parseFloat(dayData[dayData.length - 1].price || "0"))
+      );
+      const high = parseFloat(
+        ethers.formatEther(
+          Math.max(...dayData.map((d) => parseFloat(d.price || "0")))
+        )
+      );
+      const low = parseFloat(
+        ethers.formatEther(
+          Math.min(...dayData.map((d) => parseFloat(d.price || "0")))
+        )
+      );
+
+      return {
+        time: date,
+        open,
+        high,
+        low,
+        close,
+      };
+    });
+
+    return chartData;
+  };
 
   useEffect(() => {
     if (chartContainerRef.current) {
@@ -36,51 +97,14 @@ export default function Chart() {
         borderVisible: false,
         wickUpColor: "#26a69a",
         wickDownColor: "#ef5350",
+        priceFormat: {
+          type: "custom",
+          formatter: (price: number) => price.toFixed(15), // Hiển thị 15 chữ số thập phân
+        },
       });
 
-      const data = [
-        { open: 10, high: 10.63, low: 9.49, close: 9.55, time: "2022-01-17" },
-        { open: 9.55, high: 10.3, low: 9.42, close: 9.94, time: "2022-01-18" },
-        { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: "2022-01-19" },
-        { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: "2022-01-20" },
-        { open: 9.51, high: 10.46, low: 9.1, close: 10.17, time: "2022-01-21" },
-        {
-          open: 10.17,
-          high: 10.96,
-          low: 10.16,
-          close: 10.47,
-          time: "2022-01-22",
-        },
-        {
-          open: 10.47,
-          high: 11.39,
-          low: 10.4,
-          close: 10.81,
-          time: "2022-01-23",
-        },
-        {
-          open: 10.81,
-          high: 11.6,
-          low: 10.3,
-          close: 10.75,
-          time: "2022-01-24",
-        },
-        {
-          open: 10.75,
-          high: 11.6,
-          low: 10.49,
-          close: 10.93,
-          time: "2022-01-25",
-        },
-        {
-          open: 10.93,
-          high: 11.53,
-          low: 10.76,
-          close: 10.96,
-          time: "2022-01-26",
-        },
-      ];
-
+      const data = convertToChartData(decodedDataArray);
+      // console.log("Data for chart:", data);
       candlestickSeries.setData(data);
 
       chartRef.current.timeScale().fitContent();
@@ -100,7 +124,7 @@ export default function Chart() {
         chartRef.current?.remove();
       };
     }
-  }, []);
+  }, [decodedDataArray]);
 
   return (
     <div className="bg-black mb-4 rounded-lg p-4">
