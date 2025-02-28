@@ -35,7 +35,7 @@ import { set } from "lodash";
 // const INFURA_PROJECT_ID = "e11fea93e1e24107aa26935258904434";
 // const SEPOLIA_RPC_URL = `https://base-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`;
 
-const memeContractAddress = "0x9563E05970a900022AF0DFfB5aD7eA0B99025bA8";
+const memeContractAddress = "0x82B7FC2e3bBf777D5e798C3bF5eE3a2F0eC057C4";
 const formSchema = z.object({
   memeName: z.string().min(1, "Meme name is required"),
   initialPrice: z
@@ -121,12 +121,13 @@ const CreateMemeContainer = () => {
     try {
       console.log(data);
       // Upload to IPFS
+      const priceInWei = ethers.parseUnits(data.initialPrice.toString(), 18);
       const storageId = await handleUpload(data.files[0]);
       const shortName = data.memeName.substring(0, 5).toUpperCase();
       const contractAddress = await createMemeContract(
         data.memeName,
         shortName,
-        data.initialPrice,
+        priceInWei.toString(),
         storageId
       );
       if (!contractAddress) {
@@ -135,7 +136,7 @@ const CreateMemeContainer = () => {
       console.log("contractAddress:xxx", contractAddress);
       setLastMemeContract(contractAddress);
       // Insert to database
-      const priceInWei = ethers.parseUnits(data.initialPrice.toString(), 18);
+
       const resp2 = await createMeme({
         meme: {
           name: data.memeName,
@@ -212,7 +213,7 @@ const CreateMemeContainer = () => {
       const signer = await provider.getSigner();
       // The Contract object
       const USDTContract = new Contract(
-        memeContractAddress,
+        process.env.NEXT_PUBLIC_MEME_CONTRACT_ADDRESS as string,
         memeContractABI,
         signer
       );
