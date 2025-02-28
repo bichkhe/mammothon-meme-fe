@@ -59,7 +59,9 @@ const MemeItem = ({
           <span className="text-sm text-cyan-500 overflow-hidden">
             {current_minted_token &&
               price &&
-              formatAmount((price * current_minted_token) / 1e18)}
+              formatAmount(
+                (parseFloat(price) * current_minted_token) / 1e18
+              ).toString()}
             {!current_minted_token && 0} ETH
           </span>
         </div>

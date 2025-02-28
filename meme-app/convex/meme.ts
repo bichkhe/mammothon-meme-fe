@@ -150,6 +150,7 @@ export const updateContract = mutation({
       await ctx.db.patch(meme._id, {
         all_time_vol:new_all_time_vol.toString(),
         price:args.price,
+        current_minted_token: meme.current_minted_token,
         all_time_price:args.price,
         updated_at:new Date().toISOString(),
       });
