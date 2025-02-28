@@ -89,7 +89,7 @@ const CreateMemeContainer = () => {
   };
 
   const goBack = () => {
-window.history.back();
+    window.history.back();
   };
   const generateUploadUrl = useMutation(api.meme_images.generateUploadUrl);
   // const sendImage = useMutation(api.meme_images.sendImage);
@@ -135,13 +135,14 @@ window.history.back();
       console.log("contractAddress:xxx", contractAddress);
       setLastMemeContract(contractAddress);
       // Insert to database
+      const priceInWei = ethers.parseUnits(data.initialPrice.toString(), 18);
       const resp2 = await createMeme({
         meme: {
           name: data.memeName,
           addr: contractAddress || "failed",
           url: storageId,
           icon: storageId,
-          price: data.initialPrice,
+          price: priceInWei.toString(),
           market_cap: "0",
         },
       });
