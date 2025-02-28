@@ -35,7 +35,9 @@ const MarketInfo = ({
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
             MARKET CAP
           </h3>
-          <p className="text-xl text-cyan-500">{formatAmount(marketCap)} ETH</p>
+          <p className="text-xl text-cyan-500">
+            {(currentMintedToken * price) / 1e18} ETH
+          </p>
         </div>
         {/* <div>
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
@@ -45,11 +47,10 @@ const MarketInfo = ({
         </div> */}
         <div>
           <h3 className="body-sm text-light-gray uppercase p-[1px] transition-all font-thin text-slate-500">
-            ALL-TIME VOL
+            CURRENT PRICE
           </h3>
           <p className="text-xl text-cyan-500">
-            {formatAmount((currentMintedToken * parseFloat(price)).toString())}{" "}
-            ETH
+            {formatAmount((parseFloat(price) / 1e18).toString())} ETH
           </p>
         </div>
       </div>
