@@ -12,6 +12,13 @@ interface MemeItemProps {
   last_swap_at: string;
   current_minted_token: number;
 }
+
+const formatAmount = (amount: string) => {
+  return parseFloat(amount).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+  });
+};
 const MemeItem = ({
   icon,
   name,
@@ -45,23 +52,24 @@ const MemeItem = ({
         </div>
       </div>
       <div className="flex gap-4 mt-5">
-        <div className="flex flex-col ">
+        <div className="flex flex-col overflow-auto">
           <span className="body-sm  text-light-gray group-hover:text-ec-blue uppercase p-[1px] transition-all font-thin text-slate-500">
             Market Cap
           </span>
-          <span className="text-sm text-cyan-500">
+          <span className="text-sm text-cyan-500 overflow-hidden">
             {current_minted_token &&
               price &&
-              (price * current_minted_token) / 1e18}
-            {!current_minted_token && price && price / 1e18}
-            ETH
+              formatAmount((price * current_minted_token) / 1e18)}
+            {!current_minted_token && 0} ETH
           </span>
         </div>
         <div className="flex flex-col">
           <span className="body-sm font-forma text-light-gray group-hover:text-ec-blue uppercase p-[1px] transition-all font-thin text-slate-500">
             Last Price
           </span>
-          <span className="text-sm text-cyan-500">{price / 1e18} ETH</span>
+          <span className="text-sm text-cyan-500 overflow-hidden">
+            {formatAmount(price / 1e18)} ETH
+          </span>
         </div>
       </div>
     </div>
