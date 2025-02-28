@@ -213,7 +213,7 @@ const CreateMemeContainer = () => {
       const signer = await provider.getSigner();
       // The Contract object
       const USDTContract = new Contract(
-        process.env.NEXT_PUBLIC_MEME_CONTRACT_ADDRESS as string,
+        memeContractAddress,
         memeContractABI,
         signer
       );
