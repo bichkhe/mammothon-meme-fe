@@ -99,7 +99,7 @@ export default function Chart({ decodedDataArray }: TransactionsProps) {
         wickDownColor: "#ef5350",
         priceFormat: {
           type: "custom",
-          formatter: (price: number) => price.toFixed(15), // Hiển thị 15 chữ số thập phân
+          formatter: (price: number) => price.toFixed(20), // Hiển thị 20 chữ số thập phân
         },
       });
 
