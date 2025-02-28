@@ -197,7 +197,7 @@ const CreateMemeContainer = () => {
   async function createMemeContract(
     memeName: string,
     memeSymbol: string,
-    initialPrice: string,
+    initialPriceInGwei: string,
     imageUrl: string
   ) {
     if (!isConnected && !walletProvider) throw Error("User disconnected");
@@ -218,7 +218,7 @@ const CreateMemeContainer = () => {
         signer
       );
       // const salt = createSalt();
-      const initialPriceInGwei = ethers.parseUnits(initialPrice, 18);
+      // const initialPriceInGwei = ethers.parseUnits(initialPrice, 18);
       // const amountInWei = 0.005e18; // buy 1 ETH
       const result = await USDTContract.createMemeContract(
         memeName,

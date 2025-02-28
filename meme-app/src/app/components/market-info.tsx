@@ -36,7 +36,7 @@ const MarketInfo = ({
             MARKET CAP
           </h3>
           <p className="text-xl text-cyan-500">
-            {(currentMintedToken * price) / 1e18} ETH
+            {(currentMintedToken * parseFloat(price)) / 1e18} ETH
           </p>
         </div>
         {/* <div>
